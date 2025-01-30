@@ -1,0 +1,14 @@
+venv/
+
+.idea/
+
+.env
+
+alembic.ini
+
+__pycache__/
+*.pyc
+
+*.log
+
+*.swp
