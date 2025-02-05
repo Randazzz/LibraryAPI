@@ -1,13 +1,15 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends, FastAPI
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.database import get_db
 
 app = FastAPI()
 
 
-@app.get("/",)
+@app.get(
+    "/",
+)
 async def get_user():
     user = {
         "username": "testuser",
@@ -21,4 +23,3 @@ async def db_connection(db: AsyncSession = Depends(get_db)):
 
     result = await db.execute(select(1))
     return {"status": "success", "result": result.scalars().all()}
-
