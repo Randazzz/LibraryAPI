@@ -16,10 +16,6 @@ __pycache__/
 *.tmp
 *.bak
 
-# Игнорировать файлы миграций и конфигурации Alembic
-alembic.ini
-alembic/
-
 # Игнорировать файлы Git
 .git/
 .gitignore
