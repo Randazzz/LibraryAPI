@@ -7,7 +7,7 @@
 1. Склонируйте репозиторий:
 
    ```bash
-   git clone https://github.com/ваш-username/ваш-репозиторий.git
+   git clone https://github.com/Randazzz/LibraryAPI
    cd ваш-репозиторий
    ```
 2. Создайте файл .env.dev на основе примера .env.example и настройте переменные окружения
