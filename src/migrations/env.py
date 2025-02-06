@@ -4,8 +4,8 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from src.core.config import settings
+from src.db.base import Base
 from src.db.models.associations import book_genre_association  # noqa
-from src.db.models.base import Base
 from src.db.models.books import Book  # noqa
 from src.db.models.users import User  # noqa
 

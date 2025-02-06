@@ -10,11 +10,7 @@ else:
 from sqlalchemy import Date, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.db.models.associations import (
-    book_author_association,
-    book_genre_association,
-)
-from src.db.models.base import (
+from src.db.base import (
     Base,
     intpk,
     str_16,
@@ -22,6 +18,10 @@ from src.db.models.base import (
     str_64,
     str_256,
     str_1024,
+)
+from src.db.models.associations import (
+    book_author_association,
+    book_genre_association,
 )
 from src.db.models.utils import (
     default_return_utc_datetime,

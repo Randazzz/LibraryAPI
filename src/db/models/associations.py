@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, Table
 
-from src.db.models.base import Base
+from src.db.base import Base
 
 book_genre_association = Table(
     "book_genre_association",

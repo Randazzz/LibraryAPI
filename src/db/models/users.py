@@ -10,7 +10,7 @@ from pydantic import EmailStr
 from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.db.models.base import Base, str_16, str_128, uuidpk
+from src.db.base import Base, str_16, str_128, uuidpk
 
 
 class Role(str, Enum):
