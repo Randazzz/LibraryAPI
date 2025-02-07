@@ -108,4 +108,5 @@ def downgrade() -> None:
     op.drop_table("genres")
     op.drop_table("books")
     op.drop_table("authors")
+    op.execute("DROP TYPE IF EXISTS role CASCADE;")
     # ### end Alembic commands ###
