@@ -10,7 +10,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post(
-    "/register",
+    "/",
     response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Register a new user",
