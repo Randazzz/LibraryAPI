@@ -1,25 +1,7 @@
-from fastapi import Depends, FastAPI
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import FastAPI
 
-from src.db.database import get_db
+from .api.v1 import router as v1_router
 
 app = FastAPI()
 
-
-@app.get(
-    "/",
-)
-async def get_user():
-    user = {
-        "username": "testuser",
-        "password": "testpassword",
-    }
-    return user
-
-
-@app.get("/test-db")
-async def db_connection(db: AsyncSession = Depends(get_db)):
-
-    result = await db.execute(select(1))
-    return {"status": "success", "result": result.scalars().all()}
+app.include_router(v1_router)
