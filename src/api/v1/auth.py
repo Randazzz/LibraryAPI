@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from src.core.security import get_current_user
+from src.core.security import admin_required, get_current_user
 from src.db.database import get_db
 from src.schemas.auth import TokenResponse
 from src.schemas.users import UserLogin
@@ -18,18 +18,17 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
     summary="Authenticate user",
 )
 async def login(
-    user: UserLogin, db: AsyncSession = Depends(get_db)
+    user_data: UserLogin, db: AsyncSession = Depends(get_db)
 ) -> TokenResponse:
     auth_service = AuthService(db)
-    return await auth_service.login(user)
+    return await auth_service.login(user_data)
 
 
-# @router.get("/reader")
-# async def test_jwt(current_user: str = Depends(get_current_user)):
-#
-#     return {"email": current_user, "private_info": "you reader 52"}
-#
-#
-# @router.get("/admin")
-# async def test_jwt():
-#     return {"private_info": "you admin 52"}
+@router.get("/reader")
+async def test_jwt(current_user: str = Depends(get_current_user)):
+    return {"current_user": current_user}
+
+
+@router.get("/admin")
+async def test_jwt(current_user: str = Depends(admin_required)):
+    return {"current_user": current_user}

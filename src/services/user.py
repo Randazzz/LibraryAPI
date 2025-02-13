@@ -11,13 +11,13 @@ class UserService:
         self.user_repo = UserRepository(db)
 
     async def create_user(
-        self, create_user: UserCreate, role: Role = "READER"
+        self, user_data: UserCreate, role: Role = "READER"
     ) -> UserResponse:
-        hashed_password = hash_password(create_user.password)
+        hashed_password = hash_password(user_data.password)
         user = User(
-            email=create_user.email,
-            first_name=create_user.first_name,
-            last_name=create_user.last_name,
+            email=user_data.email,
+            first_name=user_data.first_name,
+            last_name=user_data.last_name,
             hashed_password=hashed_password,
             role=role,
         )
