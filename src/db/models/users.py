@@ -32,6 +32,7 @@ class User(Base):
     book_loans: Mapped[List["BookLoan"]] = relationship(
         "BookLoan", back_populates="user"
     )
+    is_superuser: Mapped[bool] = mapped_column(default=False)
 
     def __repr__(self):
         return f"<User(email='{self.email}', role='{self.role}')>"

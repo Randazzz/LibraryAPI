@@ -26,7 +26,11 @@ class AuthService:
             )
 
         access_token = create_access_token(
-            data={"sub": db_user.email, "role": db_user.role}
+            data={
+                "sub": db_user.email,
+                "role": db_user.role,
+                "is_superuser": db_user.is_superuser,
+            },
         )
         refresh_token = create_refresh_token(data={"sub": db_user.email})
         return TokenResponse(

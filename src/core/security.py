@@ -56,6 +56,7 @@ def get_current_user(
         )
         email = payload.get("sub")
         role = payload.get("role")
+        is_superuser = payload.get("is_superuser")
         if email is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -66,11 +67,20 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
-    return {"email": email, "role": role}
+    return {"email": email, "role": role, "is_superuser": is_superuser}
 
 
 def admin_required(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to access this resource",
+        )
+    return current_user
+
+
+def superuser_required(current_user: dict = Depends(get_current_user)):
+    if current_user["is_superuser"] is not True:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this resource",
