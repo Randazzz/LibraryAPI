@@ -1,8 +1,12 @@
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
+from src.db.database import get_db
+from src.services.auth import AuthService
+from src.services.user import UserService
 
 bearer_scheme = HTTPBearer()
 
@@ -47,3 +51,11 @@ def superuser_required(current_user: dict = Depends(get_current_user)):
             detail="You do not have permission to access this resource",
         )
     return current_user
+
+
+def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
+    return UserService(db)
+
+
+def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
+    return AuthService(db)

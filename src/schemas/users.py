@@ -12,6 +12,7 @@ class UserCreate(BaseModel):
     last_name: str
     password: str
 
+    # fmt: off
     @field_validator("password")
     def validate_password(cls, password):
         if len(password) < 8:
@@ -25,6 +26,7 @@ class UserCreate(BaseModel):
         if not re.search(r"[\W_]", password):
             raise ValueError("Password must contain at least one special character")
         return password
+    # fmt: on
 
 
 class UserResponse(BaseModel):

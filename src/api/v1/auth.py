@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from src.core.dependencies import admin_required, get_current_user
-from src.db.database import get_db
+from src.core.dependencies import (
+    admin_required,
+    get_auth_service,
+    get_current_user,
+)
 from src.schemas.auth import TokenResponse
 from src.schemas.users import UserLogin
 from src.services.auth import AuthService
@@ -18,9 +20,9 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
     summary="Authenticate user",
 )
 async def login(
-    user_data: UserLogin, db: AsyncSession = Depends(get_db)
+    user_data: UserLogin,
+    auth_service: AuthService = Depends(get_auth_service),
 ) -> TokenResponse:
-    auth_service = AuthService(db)
     return await auth_service.login(user_data)
 
 
