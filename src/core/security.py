@@ -6,16 +6,14 @@ import jwt
 from src.core.config import settings
 
 
-def hash_password(password: str) -> str:
+def hash_password(password: str) -> bytes:
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
-    return hashed_password.decode("utf-8")
+    return hashed_password
 
 
-def verify_password(hashed_password: str, password: str) -> bool:
-    return bcrypt.checkpw(
-        password.encode("utf-8"), hashed_password.encode("utf-8")
-    )
+def verify_password(password: str, hashed_password: bytes) -> bool:
+    return bcrypt.checkpw(password.encode("utf-8"), hashed_password)
 
 
 def create_access_token(data):

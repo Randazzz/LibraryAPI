@@ -1,8 +1,8 @@
-"""Initial migration
+"""initial migrations
 
-Revision ID: 1ec30a96705c
+Revision ID: f65ea21ee1a9
 Revises:
-Create Date: 2025-02-05 18:12:26.612277
+Create Date: 2025-02-17 13:12:21.429369
 
 """
 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "1ec30a96705c"
+revision: str = "f65ea21ee1a9"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -50,10 +50,11 @@ def upgrade() -> None:
         sa.Column("email", sa.String(length=64), nullable=False),
         sa.Column("first_name", sa.String(length=16), nullable=False),
         sa.Column("last_name", sa.String(length=16), nullable=False),
-        sa.Column("hashed_password", sa.String(length=128), nullable=False),
+        sa.Column("hashed_password", sa.LargeBinary(), nullable=False),
         sa.Column(
             "role", sa.Enum("ADMIN", "READER", name="role"), nullable=False
         ),
+        sa.Column("is_superuser", sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
         sa.UniqueConstraint("id"),
@@ -108,5 +109,4 @@ def downgrade() -> None:
     op.drop_table("genres")
     op.drop_table("books")
     op.drop_table("authors")
-    op.execute("DROP TYPE IF EXISTS role CASCADE;")
     # ### end Alembic commands ###

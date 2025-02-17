@@ -8,9 +8,10 @@ else:
 
 from pydantic import EmailStr
 from sqlalchemy import Enum as SQLAlchemyEnum
+from sqlalchemy import LargeBinary
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.db.base import Base, str_16, str_128, uuidpk
+from src.db.base import Base, str_16, uuidpk
 
 
 class Role(str, Enum):
@@ -25,7 +26,7 @@ class User(Base):
     email: Mapped[EmailStr] = mapped_column(unique=True, nullable=False)
     first_name: Mapped[str_16] = mapped_column(nullable=False)
     last_name: Mapped[str_16] = mapped_column(nullable=False)
-    hashed_password: Mapped[str_128] = mapped_column(nullable=False)
+    hashed_password: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     role: Mapped[Role] = mapped_column(
         SQLAlchemyEnum(Role), nullable=False, default=Role.READER
     )
