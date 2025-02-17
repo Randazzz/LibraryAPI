@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from src.core.security import superuser_required
+from src.core.dependencies import superuser_required
 from src.db.database import get_db
 from src.db.models.users import Role
 from src.schemas.users import UserCreate, UserResponse

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from src.core.security import admin_required, get_current_user
+from src.core.dependencies import admin_required, get_current_user
 from src.db.database import get_db
 from src.schemas.auth import TokenResponse
 from src.schemas.users import UserLogin
