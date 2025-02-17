@@ -24,13 +24,7 @@ class UserService:
             role=role,
         )
         created_user = await self.user_repo.create(user)
-        return UserResponse(
-            id=created_user.id,
-            email=created_user.email,
-            first_name=created_user.first_name,
-            last_name=created_user.last_name,
-            role=created_user.role,
-        )
+        return UserResponse.model_validate(created_user)
 
     async def get_user_by_id(self, user_id: uuid.UUID) -> User:
         user = await self.user_repo.get_by_id(user_id)
@@ -42,10 +36,4 @@ class UserService:
         user = await self.get_user_by_id(user_id)
         user.role = new_role
         await self.user_repo.update_user(user)
-        return UserResponse(
-            id=user.id,
-            email=user.email,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            role=user.role,
-        )
+        return UserResponse.model_validate(user)

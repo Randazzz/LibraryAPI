@@ -19,6 +19,9 @@ class UserResponse(BaseModel):
     last_name: str
     role: Role
 
+    class Config:
+        from_attributes = True
+
 
 class UserLogin(BaseModel):
     email: EmailStr
