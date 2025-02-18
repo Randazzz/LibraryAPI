@@ -11,7 +11,7 @@ from src.core.dependencies import (
     superuser_required,
 )
 from src.db.models.users import Role, User
-from src.schemas.users import UserCreate, UserResponse
+from src.schemas.users import UserCreate, UserResponse, UserUpdate
 from src.services.user import UserService
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -71,3 +71,17 @@ async def get_current_user(
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
     return user_service.user_to_user_response(current_user)
+
+
+@router.patch(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update current user",
+)
+async def update_current_user(
+    new_data: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    user_service: UserService = Depends(get_user_service),
+) -> UserResponse:
+    return await user_service.update_user_data(current_user.id, new_data)

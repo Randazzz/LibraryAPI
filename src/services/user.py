@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.security import hash_password
 from src.db.models.users import Role, User
 from src.db.repositories.user import UserRepository
-from src.schemas.users import UserCreate, UserResponse
+from src.schemas.users import UserCreate, UserResponse, UserUpdate
 
 
 class UserService:
@@ -36,6 +36,18 @@ class UserService:
     ) -> UserResponse:
         user = await self.get_user_by_id(user_id)
         user.role = new_role
+        await self.user_repo.update_user(user)
+        return UserResponse.model_validate(user)
+
+    async def update_user_data(
+        self, user_id: uuid.UUID, new_data: UserUpdate
+    ) -> UserResponse:
+        user = await self.get_user_by_id(user_id)
+        user_dict = user.__dict__
+        new_data_dict = new_data.dict(exclude_none=True, exclude_unset=True)
+        user_dict.update(new_data_dict)
+        for key, value in user_dict.items():
+            setattr(user, key, value)
         await self.user_repo.update_user(user)
         return UserResponse.model_validate(user)
 

@@ -1,5 +1,6 @@
 import re
 import uuid
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr, field_validator
 
@@ -44,3 +45,8 @@ class UserResponse(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class UserUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
