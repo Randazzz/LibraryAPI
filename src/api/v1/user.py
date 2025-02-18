@@ -6,10 +6,11 @@ from starlette import status
 
 from src.core.dependencies import (
     admin_required,
+    get_current_user,
     get_user_service,
     superuser_required,
 )
-from src.db.models.users import Role
+from src.db.models.users import Role, User
 from src.schemas.users import UserCreate, UserResponse
 from src.services.user import UserService
 
@@ -57,3 +58,16 @@ async def get_users(
     user_service: UserService = Depends(get_user_service),
 ) -> List[UserResponse]:
     return await user_service.get_users(limit=limit, offset=offset)
+
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get current user",
+)
+async def get_current_user(
+    current_user: User = Depends(get_current_user),
+    user_service: UserService = Depends(get_user_service),
+) -> UserResponse:
+    return user_service.user_to_user_response(current_user)

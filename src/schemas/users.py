@@ -35,6 +35,7 @@ class UserResponse(BaseModel):
     first_name: str
     last_name: str
     role: Role
+    is_superuser: bool
 
     class Config:
         from_attributes = True

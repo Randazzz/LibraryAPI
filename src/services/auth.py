@@ -25,14 +25,8 @@ class AuthService:
                 detail="Invalid credentials",
             )
 
-        access_token = create_access_token(
-            data={
-                "sub": db_user.email,
-                "role": db_user.role,
-                "is_superuser": db_user.is_superuser,
-            },
-        )
-        refresh_token = create_refresh_token(data={"sub": db_user.email})
+        access_token = create_access_token(data={"sub": db_user.id})
+        refresh_token = create_refresh_token(data={"sub": db_user.id})
         return TokenResponse(
             access_token=access_token, refresh_token=refresh_token
         )

@@ -42,3 +42,7 @@ class UserService:
     async def get_users(self, limit: int, offset: int) -> List[UserResponse]:
         users = await self.user_repo.get_users(limit=limit, offset=offset)
         return [UserResponse.model_validate(user) for user in users]
+
+    @staticmethod
+    def user_to_user_response(user: User) -> UserResponse:
+        return UserResponse.model_validate(user)
