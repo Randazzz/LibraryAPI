@@ -1,4 +1,5 @@
 import uuid
+from typing import List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -37,3 +38,7 @@ class UserService:
         user.role = new_role
         await self.user_repo.update_user(user)
         return UserResponse.model_validate(user)
+
+    async def get_users(self, limit: int, offset: int) -> List[UserResponse]:
+        users = await self.user_repo.get_users(limit=limit, offset=offset)
+        return [UserResponse.model_validate(user) for user in users]

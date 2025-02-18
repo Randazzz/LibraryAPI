@@ -1,9 +1,11 @@
 import uuid
+from typing import List, Sequence
 
 from pydantic import EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.db.models import User
 from src.db.models.users import User
 
 
@@ -31,3 +33,8 @@ class UserRepository:
         self.db.add(user)
         await self.db.commit()
         await self.db.refresh(user)
+
+    async def get_users(self, limit: int, offset: int) -> Sequence[User]:
+        stmt = select(User).offset(offset).limit(limit)
+        result = await self.db.execute(stmt)
+        return result.scalars().all()
