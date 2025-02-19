@@ -6,7 +6,7 @@ from starlette import status
 
 from src.core.dependencies import (
     admin_required,
-    get_current_user,
+    get_current_user_for_access,
     get_user_service,
     superuser_required,
 )
@@ -67,10 +67,10 @@ async def get_users(
     summary="Get current user",
 )
 async def get_current_user(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_for_access),
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
-    return user_service.user_to_user_response(current_user)
+    return await user_service.user_to_user_response(current_user)
 
 
 @router.patch(
@@ -81,7 +81,7 @@ async def get_current_user(
 )
 async def update_current_user(
     new_data: UserUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_for_access),
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
     return await user_service.update_user_data(current_user.id, new_data)

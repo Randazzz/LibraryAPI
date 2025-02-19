@@ -2,10 +2,11 @@ from fastapi import APIRouter, Depends
 from starlette import status
 
 from src.core.dependencies import (
-    admin_required,
     get_auth_service,
-    get_current_user,
+    get_current_user_for_refresh,
 )
+from src.core.security import create_access_token
+from src.db.models import User
 from src.schemas.auth import TokenResponse
 from src.schemas.users import UserLogin
 from src.services.auth import AuthService
@@ -26,11 +27,15 @@ async def login(
     return await auth_service.login(user_data)
 
 
-@router.get("/reader")
-async def test_jwt(current_user: str = Depends(get_current_user)):
-    return {"current_user": current_user}
-
-
-@router.get("/admin")
-async def test_jwt(current_user: str = Depends(admin_required)):
-    return {"current_user": current_user}
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+    response_model_exclude_none=True,
+    status_code=status.HTTP_200_OK,
+    summary="Refresh access token",
+)
+async def refresh_jwt(
+    current_user: User = Depends(get_current_user_for_refresh),
+) -> TokenResponse:
+    access_token = create_access_token(data={"sub": current_user.id})
+    return TokenResponse(access_token=access_token)

@@ -56,5 +56,5 @@ class UserService:
         return [UserResponse.model_validate(user) for user in users]
 
     @staticmethod
-    def user_to_user_response(user: User) -> UserResponse:
+    async def user_to_user_response(user: User) -> UserResponse:
         return UserResponse.model_validate(user)
