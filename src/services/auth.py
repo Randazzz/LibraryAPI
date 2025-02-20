@@ -1,11 +1,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.security import (
-    create_access_token,
-    create_refresh_token,
-    verify_password,
-)
+from src.core.auth import create_access_token, create_refresh_token
+from src.core.security import verify_password
 from src.db.repositories.user import UserRepository
 from src.schemas.auth import TokenResponse
 from src.schemas.users import UserLogin
@@ -30,3 +27,8 @@ class AuthService:
         return TokenResponse(
             access_token=access_token, refresh_token=refresh_token
         )
+
+    @staticmethod
+    async def refresh_jwt(data: dict) -> TokenResponse:
+        access_token = create_access_token(data=data)
+        return TokenResponse(access_token=access_token)

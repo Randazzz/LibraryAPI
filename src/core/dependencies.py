@@ -1,9 +1,8 @@
-import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.config import settings
+from src.core.validations import get_current_user
 from src.db.database import get_db
 from src.db.models import User
 from src.services.auth import AuthService
@@ -18,56 +17,6 @@ def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
 
 def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
     return AuthService(db)
-
-
-async def validate_token(
-    token_type: str,
-    payload: dict,
-) -> None:
-    current_token_type = payload.get("type")
-    if current_token_type != token_type:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token type '{current_token_type}' expected '{token_type}'",
-        )
-    if "sub" not in payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token",
-        )
-
-
-async def get_payload(
-    credentials: HTTPAuthorizationCredentials,
-    token_type: str,
-) -> dict:
-    try:
-        token = credentials.credentials
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        await validate_token(token_type, payload)
-        return payload
-    except jwt.PyJWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
-
-
-async def get_current_user(
-    token_type: str,
-    credentials: HTTPAuthorizationCredentials,
-    user_service: UserService,
-) -> User:
-    payload = await get_payload(credentials, token_type)
-    user = await user_service.get_user_by_id(payload["sub"])
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
-    return user
 
 
 async def get_current_user_for_access(
