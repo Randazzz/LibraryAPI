@@ -43,10 +43,9 @@ class UserService:
         self, user_id: uuid.UUID, new_data: UserUpdate
     ) -> UserResponse:
         user = await self.get_user_by_id(user_id)
-        user_dict = user.__dict__
-        new_data_dict = new_data.dict(exclude_none=True, exclude_unset=True)
-        user_dict.update(new_data_dict)
-        for key, value in user_dict.items():
+        for key, value in new_data.dict(
+            exclude_none=True, exclude_unset=True
+        ).items():
             setattr(user, key, value)
         await self.user_repo.update_user(user)
         return UserResponse.model_validate(user)
