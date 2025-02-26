@@ -4,6 +4,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 
 from src.core.config import settings
+from src.core.exceptions import InvalidTokenException
 from src.db.models import User
 from src.services.user import UserService
 
@@ -19,10 +20,7 @@ async def validate_token(
             detail=f"Invalid token type '{current_token_type}' expected '{token_type}'",
         )
     if "sub" not in payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token",
-        )
+        raise InvalidTokenException()
 
 
 async def get_payload(
@@ -37,10 +35,7 @@ async def get_payload(
         await validate_token(token_type, payload)
         return payload
     except jwt.PyJWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
+        raise InvalidTokenException()
 
 
 async def get_current_user(
@@ -50,9 +45,4 @@ async def get_current_user(
 ) -> User:
     payload = await get_payload(credentials, token_type)
     user = await user_service.get_user_by_id(payload["sub"])
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
     return user

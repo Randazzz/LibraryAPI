@@ -1,8 +1,7 @@
 import uuid
 from typing import List
 
-from fastapi import APIRouter, Depends, Query
-from starlette import status
+from fastapi import APIRouter, Depends, Query, status
 
 from src.core.dependencies import (
     admin_required,
