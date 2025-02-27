@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, Query, status
@@ -11,6 +12,8 @@ from src.core.dependencies import (
 from src.db.models.users import Role, User
 from src.schemas.users import UserCreate, UserResponse, UserUpdate
 from src.services.user import UserService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -40,7 +43,9 @@ async def change_user_role(
     current_user: str = Depends(superuser_required),
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
-    return await user_service.change_user_role(user_id, new_role)
+    user = await user_service.change_user_role(user_id, new_role)
+    logger.info(f"Пользователь {current_user} изменил роль пользователя с id '{user_id}' на {new_role}")
+    return user
 
 
 @router.get(

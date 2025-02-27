@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    LOG_LEVEL: str = "INFO"
+
     @property
     def database_url(self) -> str:
         return (
