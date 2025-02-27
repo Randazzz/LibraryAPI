@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, datetime
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from src.db.models.users import User
@@ -34,7 +34,7 @@ class Genre(Base):
 
     id: Mapped[intpk]
     name: Mapped[str_16] = mapped_column(unique=True, nullable=False)
-    books: Mapped[List["Book"]] = relationship(
+    books: Mapped[list["Book"]] = relationship(
         secondary=book_genre_association, back_populates="genres"
     )
 
@@ -49,13 +49,13 @@ class Book(Base):
     title: Mapped[str_64] = mapped_column(nullable=False)
     description: Mapped[Optional[str_256]]
     published_at: Mapped[date] = mapped_column(Date, nullable=False)
-    authors: Mapped[List["Author"]] = relationship(
+    authors: Mapped[list["Author"]] = relationship(
         secondary=book_author_association, back_populates="books"
     )
-    genres: Mapped[List[Genre]] = relationship(
+    genres: Mapped[list[Genre]] = relationship(
         secondary=book_genre_association, back_populates="books"
     )
-    book_loans: Mapped[List["BookLoan"]] = relationship(
+    book_loans: Mapped[list["BookLoan"]] = relationship(
         "BookLoan", back_populates="book"
     )
     available_copies: Mapped[int] = mapped_column(nullable=False, default=0)
@@ -71,7 +71,7 @@ class Author(Base):
     name: Mapped[str_32] = mapped_column(nullable=False)
     biography: Mapped[Optional[str_1024]]
     birth_date: Mapped[date] = mapped_column(nullable=False)
-    books: Mapped[List["Book"]] = relationship(
+    books: Mapped[list["Book"]] = relationship(
         secondary=book_author_association, back_populates="authors"
     )
 

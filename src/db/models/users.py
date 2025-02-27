@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.db.models.books import BookLoan
@@ -30,7 +30,7 @@ class User(Base):
     role: Mapped[Role] = mapped_column(
         SQLAlchemyEnum(Role), nullable=False, default=Role.READER
     )
-    book_loans: Mapped[List["BookLoan"]] = relationship(
+    book_loans: Mapped[list["BookLoan"]] = relationship(
         "BookLoan", back_populates="user"
     )
     is_superuser: Mapped[bool] = mapped_column(default=False)

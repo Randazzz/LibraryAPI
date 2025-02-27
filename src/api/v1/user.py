@@ -1,5 +1,4 @@
 import uuid
-from typing import List
 
 from fastapi import APIRouter, Depends, Query, status
 
@@ -46,7 +45,7 @@ async def change_user_role(
 
 @router.get(
     "/",
-    response_model=List[UserResponse],
+    response_model=list[UserResponse],
     status_code=status.HTTP_200_OK,
     summary="User list",
 )
@@ -55,7 +54,7 @@ async def get_users(
     offset: int = Query(0, ge=0),
     current_user: str = Depends(admin_required),
     user_service: UserService = Depends(get_user_service),
-) -> List[UserResponse]:
+) -> list[UserResponse]:
     return await user_service.get_users(limit=limit, offset=offset)
 
 
