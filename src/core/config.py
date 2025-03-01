@@ -33,4 +33,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env.dev")
 
 
+class TestSettings(Settings):
+    model_config = SettingsConfigDict(env_file=".env.test")
+
+
+test_settings = TestSettings()
+
 settings = Settings()

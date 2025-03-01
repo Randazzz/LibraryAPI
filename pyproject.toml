@@ -9,3 +9,7 @@ exclude = '''
 [tool.isort]
 profile = "black"
 skip = ["venv", "__pycache__", ".git", ".pytest_cache"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
