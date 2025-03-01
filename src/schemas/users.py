@@ -2,7 +2,7 @@ import re
 import uuid
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 
 from src.db.models.users import Role
 
@@ -38,8 +38,7 @@ class UserResponse(BaseModel):
     role: Role
     is_superuser: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserLogin(BaseModel):

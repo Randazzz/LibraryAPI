@@ -44,7 +44,9 @@ async def change_user_role(
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
     user = await user_service.change_user_role(user_id, new_role)
-    logger.info(f"Пользователь {current_user} изменил роль пользователя с id '{user_id}' на {new_role}")
+    logger.info(
+        f"Пользователь {current_user} изменил роль пользователя с id '{user_id}' на {new_role}"
+    )
     return user
 
 
