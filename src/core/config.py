@@ -1,7 +1,4 @@
-from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -30,11 +27,11 @@ class Settings(BaseSettings):
             f"{self.DATABASE_PORT}/{self.DATABASE_NAME}"
         )
 
-    model_config = SettingsConfigDict(env_file=".env.dev")
+    model_config = SettingsConfigDict(env_file=".env.dev", env_prefix="DEV_")
 
 
 class TestSettings(Settings):
-    model_config = SettingsConfigDict(env_file=".env.test")
+    model_config = SettingsConfigDict(env_file=".env.test", env_prefix="TEST_")
 
 
 test_settings = TestSettings()
