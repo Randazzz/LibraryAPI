@@ -13,7 +13,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post(
-    "/",
+    "",
     response_model=TokenResponse,
     status_code=status.HTTP_200_OK,
     summary="Authenticate user",

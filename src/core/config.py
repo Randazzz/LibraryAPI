@@ -31,6 +31,8 @@ class Settings(BaseSettings):
 
 
 class TestSettings(Settings):
+    LOG_LEVEL: str = "WARNING"
+
     model_config = SettingsConfigDict(env_file=".env.test", env_prefix="TEST_")
 
 

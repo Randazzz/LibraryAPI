@@ -51,7 +51,7 @@ async def change_user_role(
 
 
 @router.get(
-    "/",
+    "",
     response_model=list[UserResponse],
     status_code=status.HTTP_200_OK,
     summary="User list",
