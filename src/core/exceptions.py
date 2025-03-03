@@ -18,7 +18,7 @@ class InvalidTokenException(HTTPException):
 
 
 # fmt: off
-class PermissionDeniedError(HTTPException):
+class PermissionDeniedException(HTTPException):
     def __init__(self, detail="Permission denied"):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,

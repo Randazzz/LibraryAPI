@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.exceptions import PermissionDeniedError
+from src.core.exceptions import PermissionDeniedException
 from src.core.validations import get_current_user
 from src.db.database import get_db
 from src.db.models import User
@@ -44,7 +44,7 @@ def admin_required(
     current_user: User = Depends(get_current_user_for_access),
 ) -> User:
     if current_user.role != "admin":
-        raise PermissionDeniedError()
+        raise PermissionDeniedException()
     return current_user
 
 
@@ -52,5 +52,5 @@ def superuser_required(
     current_user: User = Depends(get_current_user_for_access),
 ) -> User:
     if current_user.is_superuser is not True:
-        raise PermissionDeniedError()
+        raise PermissionDeniedException()
     return current_user

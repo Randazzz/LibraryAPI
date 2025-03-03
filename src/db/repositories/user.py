@@ -1,13 +1,12 @@
 import uuid
-from typing import Any, Optional, Sequence
+from typing import Sequence
 
 from fastapi import HTTPException, status
 from pydantic import EmailStr
-from sqlalchemy import Row, RowMapping, select
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.exceptions import UserNotFoundException
 from src.db.models.users import User
 
 
@@ -28,20 +27,20 @@ class UserRepository:
                 detail="User with this email already exists.",
             )
 
-    async def get_by_email(self, email: EmailStr) -> User:
+    async def get_by_email(self, email: EmailStr) -> User | None:
         stmt = select(User).filter(User.email == email)  # type: ignore
         result = await self.db.execute(stmt)
         user = result.scalars().first()
         if not user:
-            raise UserNotFoundException()
+            return None
         return user
 
-    async def get_by_id(self, user_id: uuid.UUID) -> User:
+    async def get_by_id(self, user_id: uuid.UUID) -> User | None:
         stmt = select(User).filter(User.id == user_id)  # type: ignore
         result = await self.db.execute(stmt)
         user = result.scalars().first()
         if not user:
-            raise UserNotFoundException()
+            return None
         return user
 
     async def update_user(self, user: User) -> None:

@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.exceptions import UserNotFoundException
 from src.core.security import hash_password
 from src.db.models.users import Role, User
 from src.db.repositories.user import UserRepository
@@ -28,6 +29,8 @@ class UserService:
 
     async def get_user_by_id(self, user_id: uuid.UUID) -> User:
         user = await self.user_repo.get_by_id(user_id)
+        if user is None:
+            raise UserNotFoundException()
         return user
 
     async def change_user_role(
