@@ -49,3 +49,11 @@ class UserLogin(BaseModel):
 class UserUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+
+
+class UserCreateResponseTest(BaseModel):
+    id: uuid.UUID
+    email: EmailStr
+    password: str
+    access_token: str
+    refresh_token: str

@@ -1,9 +1,16 @@
-async def test_login(async_client, create_reader):
+from httpx import AsyncClient
+
+from src.schemas.users import UserCreateResponseTest
+
+
+async def test_login(
+    async_client: AsyncClient, create_reader: UserCreateResponseTest
+):
     response = await async_client.post(
         "/api/v1/auth",
         json={
-            "email": create_reader["email"],
-            "password": create_reader["password"],
+            "email": create_reader.email,
+            "password": create_reader.password,
         },
     )
     response_json = response.json()
@@ -19,8 +26,10 @@ async def test_login(async_client, create_reader):
     ), f"'refresh_token' not found in response JSON: {response_json}"
 
 
-async def test_refresh_jwt(async_client, create_reader):
-    headers = {"Authorization": f"Bearer {create_reader["refresh_token"]}"}
+async def test_refresh_jwt(
+    async_client: AsyncClient, create_reader: UserCreateResponseTest
+):
+    headers = {"Authorization": f"Bearer {create_reader.refresh_token}"}
     response = await async_client.post("/api/v1/auth/refresh", headers=headers)
     response_json = response.json()
 
@@ -35,7 +44,7 @@ async def test_refresh_jwt(async_client, create_reader):
     ), f"'refresh_token' should not be present in response JSON: {response_json}"
 
 
-async def test_login_invalid_credentials(async_client):
+async def test_login_invalid_credentials(async_client: AsyncClient):
     response = await async_client.post(
         "/api/v1/auth",
         json={
@@ -59,8 +68,10 @@ async def test_login_invalid_credentials(async_client):
     ), f"Unexpected detail message: {response_json['detail']}"
 
 
-async def test_refresh_jwt_with_access(async_client, create_reader):
-    headers = {"Authorization": f"Bearer {create_reader["access_token"]}"}
+async def test_refresh_jwt_with_access(
+    async_client: AsyncClient, create_reader: UserCreateResponseTest
+):
+    headers = {"Authorization": f"Bearer {create_reader.access_token}"}
     response = await async_client.post("/api/v1/auth/refresh", headers=headers)
     response_json = response.json()
 
@@ -79,7 +90,7 @@ async def test_refresh_jwt_with_access(async_client, create_reader):
     ), f"Unexpected detail message: {response_json['detail']}"
 
 
-async def test_refresh_jwt_with_invalid_token(async_client, create_reader):
+async def test_refresh_jwt_with_invalid_token(async_client: AsyncClient):
     headers = {"Authorization": "Bearer invalid_token"}
     response = await async_client.post("/api/v1/auth/refresh", headers=headers)
     response_json = response.json()
@@ -98,7 +109,7 @@ async def test_refresh_jwt_with_invalid_token(async_client, create_reader):
     ), f"Unexpected detail message: {response_json['detail']}"
 
 
-async def test_refresh_jwt_not_auth(async_client, create_reader):
+async def test_refresh_jwt_not_auth(async_client: AsyncClient):
     response = await async_client.post("/api/v1/auth/refresh")
     response_json = response.json()
 

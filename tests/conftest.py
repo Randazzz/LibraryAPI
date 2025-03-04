@@ -10,7 +10,9 @@ from sqlalchemy.ext.asyncio import (
 from src.core.config import test_settings
 from src.db.base import Base
 from src.db.database import get_db
+from src.db.models.users import Role
 from src.main import app
+from src.schemas.users import UserCreateResponseTest
 from tests.utils import create_user
 
 DATABASE_URL_TEST: str = test_settings.database_url
@@ -42,7 +44,7 @@ async def setup_test_db() -> AsyncGenerator[None, None]:
 
 
 @pytest.fixture
-async def async_client():
+async def async_client() -> AsyncClient:
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
@@ -50,7 +52,7 @@ async def async_client():
 
 
 @pytest.fixture(scope="function")
-async def create_superuser():
+async def create_superuser() -> UserCreateResponseTest:
     async with async_session_test() as session:
         return await create_user(
             session, "superuser@example.com", "Superuser1!", is_superuser=True
@@ -58,6 +60,23 @@ async def create_superuser():
 
 
 @pytest.fixture(scope="function")
-async def create_reader():
+async def create_admin() -> UserCreateResponseTest:
     async with async_session_test() as session:
-        return await create_user(session, "reader1@example.com", "Reader1!")
+        return await create_user(
+            session, "administrator@example.com", "Administrator1!", Role.ADMIN
+        )
+
+
+@pytest.fixture(scope="function")
+async def create_reader() -> UserCreateResponseTest:
+    async with async_session_test() as session:
+        return await create_user(session, "reader0@example.com", "Reader0!")
+
+
+@pytest.fixture(scope="function")
+async def create_three_readers() -> None:
+    async with async_session_test() as session:
+        for i in range(3):
+            await create_user(
+                session, f"reader{i + 1}@example.com", f"Reader{i + 1}!"
+            )

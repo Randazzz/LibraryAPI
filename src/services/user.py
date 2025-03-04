@@ -45,7 +45,7 @@ class UserService:
         self, user_id: uuid.UUID, new_data: UserUpdate
     ) -> UserResponse:
         user = await self.get_user_by_id(user_id)
-        for key, value in new_data.dict(
+        for key, value in new_data.model_dump(
             exclude_none=True, exclude_unset=True
         ).items():
             setattr(user, key, value)
