@@ -46,7 +46,7 @@ class Book(Base):
     __tablename__ = "books"
 
     id: Mapped[intpk]
-    title: Mapped[str_64] = mapped_column(nullable=False)
+    title: Mapped[str_64] = mapped_column(nullable=False, unique=True)
     description: Mapped[Optional[str_256]]
     published_at: Mapped[date] = mapped_column(Date, nullable=False)
     authors: Mapped[list["Author"]] = relationship(
@@ -68,7 +68,7 @@ class Author(Base):
     __tablename__ = "authors"
 
     id: Mapped[intpk]
-    name: Mapped[str_32] = mapped_column(nullable=False)
+    name: Mapped[str_32] = mapped_column(nullable=False, unique=True)
     biography: Mapped[Optional[str_1024]]
     birth_date: Mapped[date] = mapped_column(nullable=False)
     books: Mapped[list["Book"]] = relationship(
