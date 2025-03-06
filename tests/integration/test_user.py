@@ -131,8 +131,12 @@ async def test_update_current_user(
     except ValidationError as e:
         pytest.fail(f"Response validation failed: {e}")
     assert user_response.id == create_reader.id, "User ID does not match"
-    assert user_response.first_name == json["first_name"]
-    assert user_response.last_name == json["last_name"]
+    assert (
+        user_response.first_name == json["first_name"]
+    ), "User first_name does not match"
+    assert (
+        user_response.last_name == json["last_name"]
+    ), "User last_name does not match"
 
 
 async def test_register_with_invalid_data(async_client: AsyncClient):

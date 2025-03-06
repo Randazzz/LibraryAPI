@@ -12,8 +12,9 @@ from src.db.base import Base
 from src.db.database import get_db
 from src.db.models.users import Role
 from src.main import app
+from src.schemas.author import AuthorCreateResponseTest
 from src.schemas.users import UserCreateResponseTest
-from tests.utils import create_user
+from tests.utils import create_author_for_tests, create_user
 
 DATABASE_URL_TEST: str = test_settings.database_url
 
@@ -79,4 +80,27 @@ async def create_three_readers() -> None:
         for i in range(3):
             await create_user(
                 session, f"reader{i + 1}@example.com", f"Reader{i + 1}!"
+            )
+
+
+@pytest.fixture(scope="function")
+async def create_author() -> AuthorCreateResponseTest:
+    async with async_session_test() as session:
+        return await create_author_for_tests(
+            session,
+            "Some Author0",
+            "2000-12-24",
+            biography="author0 biography",
+        )
+
+
+@pytest.fixture(scope="function")
+async def create_three_authors() -> None:
+    async with async_session_test() as session:
+        for i in range(3):
+            await create_author_for_tests(
+                session,
+                f"Some Author{i + 1}",
+                f"200{i + 1}-12-24",
+                biography=f"author{i + 1} biography",
             )

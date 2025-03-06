@@ -27,3 +27,10 @@ class AuthorUpdate(BaseModel):
 
 class AuthorDeleteResponse(BaseModel):
     message: Optional[str] = "Author deleted successfully"
+
+
+class AuthorCreateResponseTest(BaseModel):
+    id: int
+    name: str
+    biography: Optional[str] = None
+    birth_date: date

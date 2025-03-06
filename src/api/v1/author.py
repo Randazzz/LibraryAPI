@@ -23,7 +23,7 @@ router = APIRouter(prefix="/authors", tags=["Authors"])
     status_code=status.HTTP_201_CREATED,
     summary="Create a new author",
 )
-async def create(
+async def create_author(
     author_data: AuthorCreate,
     current_user: User = Depends(admin_required),
     author_service: AuthorService = Depends(get_author_service),
