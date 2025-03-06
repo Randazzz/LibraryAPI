@@ -9,6 +9,11 @@ class UserNotFoundException(HTTPException):
         )
 
 
+class AuthorNotFoundException(HTTPException):
+    def __init__(self, detail="Author not found"):
+        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
+
+
 class InvalidTokenException(HTTPException):
     def __init__(self, detail="Invalid token"):
         super().__init__(

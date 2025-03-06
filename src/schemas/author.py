@@ -3,15 +3,12 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from src.schemas.book import Book
-
 
 class AuthorResponse(BaseModel):
     id: int
     name: str
     biography: Optional[str] = None
     birth_date: date
-    books: Optional[list[Book]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -20,4 +17,13 @@ class AuthorCreate(BaseModel):
     name: str
     biography: Optional[str] = None
     birth_date: date
-    books: Optional[list[Book]] = None
+
+
+class AuthorUpdate(BaseModel):
+    name: Optional[str] = None
+    biography: Optional[str] = None
+    birth_date: Optional[date] = None
+
+
+class AuthorDeleteResponse(BaseModel):
+    message: Optional[str] = "Author deleted successfully"
