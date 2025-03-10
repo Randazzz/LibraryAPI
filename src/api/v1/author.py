@@ -28,7 +28,7 @@ async def create_author(
     current_user: User = Depends(admin_required),
     author_service: AuthorService = Depends(get_author_service),
 ) -> AuthorResponse:
-    author = await author_service.create_author(author_data)
+    author = await author_service.create(author_data)
     logger.info(f"Пользователь {current_user} добавил автора '{author}'")
     return author
 
@@ -44,14 +44,16 @@ async def get_authors(
     offset: int = Query(0, ge=0),
     author_service: AuthorService = Depends(get_author_service),
 ) -> list[AuthorResponse]:
-    return await author_service.get_authors(limit=limit, offset=offset)
+    return await author_service.get_all_with_pagination(
+        limit=limit, offset=offset
+    )
 
 
 @router.patch(
     "/update/{author_id}",
     response_model=AuthorResponse,
     status_code=status.HTTP_200_OK,
-    summary="Update author for id",
+    summary="Update author by id",
 )
 async def update_author(
     author_id: int,
@@ -59,7 +61,7 @@ async def update_author(
     current_user: User = Depends(admin_required),
     author_service: AuthorService = Depends(get_author_service),
 ) -> AuthorResponse:
-    author = await author_service.update_author_data(author_id, new_data)
+    author = await author_service.update(author_id, new_data)
     logger.info(f"Пользователь {current_user} изменил автора '{author}'")
     return author
 
@@ -68,13 +70,13 @@ async def update_author(
     "/delete/{author_id}",
     response_model=AuthorDeleteResponse,
     status_code=status.HTTP_200_OK,
-    summary="Delete author for id",
+    summary="Delete author by id",
 )
 async def delete_author(
     author_id: int,
     current_user: User = Depends(admin_required),
     author_service: AuthorService = Depends(get_author_service),
 ) -> AuthorDeleteResponse:
-    author = await author_service.delete_author(author_id)
+    author = await author_service.delete(author_id)
     logger.info(f"Пользователь {current_user} удалил автора '{author}'")
     return AuthorDeleteResponse()

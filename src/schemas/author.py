@@ -1,36 +1,26 @@
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class AuthorResponse(BaseModel):
-    id: int
-    name: str
-    biography: Optional[str] = None
+class AuthorCreate(BaseModel):
+    name: str = Field(..., max_length=32)
+    biography: Optional[str] = Field(default=None, max_length=1024)
     birth_date: date
+
+
+class AuthorResponse(AuthorCreate):
+    id: int
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class AuthorCreate(BaseModel):
-    name: str
-    biography: Optional[str] = None
-    birth_date: date
-
-
 class AuthorUpdate(BaseModel):
-    name: Optional[str] = None
-    biography: Optional[str] = None
-    birth_date: Optional[date] = None
+    name: Optional[str] = Field(default=None, max_length=32)
+    biography: Optional[str] = Field(default=None, max_length=1024)
+    birth_date: Optional[date]
 
 
 class AuthorDeleteResponse(BaseModel):
     message: Optional[str] = "Author deleted successfully"
-
-
-class AuthorCreateResponseTest(BaseModel):
-    id: int
-    name: str
-    biography: Optional[str] = None
-    birth_date: date

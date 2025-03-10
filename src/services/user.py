@@ -13,7 +13,7 @@ class UserService:
     def __init__(self, db: AsyncSession):
         self.user_repo = UserRepository(db)
 
-    async def create_user(
+    async def create(
         self, user_data: UserCreate, role: Role = "READER"
     ) -> UserResponse:
         hashed_password = hash_password(user_data.password)
@@ -27,34 +27,38 @@ class UserService:
         created_user = await self.user_repo.create(user)
         return UserResponse.model_validate(created_user)
 
-    async def get_user_by_id(self, user_id: uuid.UUID) -> User:
-        user = await self.user_repo.get_by_id(user_id)
+    async def get_by_id_or_raise(self, user_id: uuid.UUID) -> User:
+        user = await self.user_repo.get_by_id_or_none(user_id)
         if user is None:
             raise UserNotFoundException()
         return user
 
-    async def change_user_role(
+    async def get_all_with_pagination(
+        self, limit: int, offset: int
+    ) -> list[UserResponse]:
+        users = await self.user_repo.get_all_with_pagination(
+            limit=limit, offset=offset
+        )
+        return [UserResponse.model_validate(user) for user in users]
+
+    async def change_role(
         self, user_id: uuid.UUID, new_role: Role
     ) -> UserResponse:
-        user = await self.get_user_by_id(user_id)
+        user = await self.get_by_id_or_raise(user_id)
         user.role = new_role
-        await self.user_repo.update_user(user)
+        await self.user_repo.update(user)
         return UserResponse.model_validate(user)
 
-    async def update_user_data(
+    async def update_data(
         self, user_id: uuid.UUID, new_data: UserUpdate
     ) -> UserResponse:
-        user = await self.get_user_by_id(user_id)
+        user = await self.get_by_id_or_raise(user_id)
         for key, value in new_data.model_dump(
             exclude_none=True, exclude_unset=True
         ).items():
             setattr(user, key, value)
-        await self.user_repo.update_user(user)
+        await self.user_repo.update(user)
         return UserResponse.model_validate(user)
-
-    async def get_users(self, limit: int, offset: int) -> list[UserResponse]:
-        users = await self.user_repo.get_users(limit=limit, offset=offset)
-        return [UserResponse.model_validate(user) for user in users]
 
     @staticmethod
     async def user_to_user_response(user: User) -> UserResponse:

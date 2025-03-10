@@ -1,12 +1,11 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class GenreCreate(BaseModel):
-    name: str
+    name: str = Field(..., max_length=16)
 
 
-class GenreResponse(BaseModel):
+class GenreResponse(GenreCreate):
     id: int
-    name: str
 
     model_config = ConfigDict(from_attributes=True)

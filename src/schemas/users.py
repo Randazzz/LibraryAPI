@@ -2,16 +2,19 @@ import re
 import uuid
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from src.db.models.users import Role
 
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     email: EmailStr
-    first_name: str
-    last_name: str
-    password: str
+    first_name: str = Field(..., max_length=16)
+    last_name: str = Field(..., max_length=16)
+
+
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=8, max_length=16)
 
     # fmt: off
     @field_validator("password")
@@ -30,11 +33,8 @@ class UserCreate(BaseModel):
     # fmt: on
 
 
-class UserResponse(BaseModel):
+class UserResponse(UserBase):
     id: uuid.UUID
-    email: EmailStr
-    first_name: str
-    last_name: str
     role: Role
     is_superuser: bool
 
@@ -47,8 +47,8 @@ class UserLogin(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
+    first_name: Optional[str] = Field(default=None, max_length=16)
+    last_name: Optional[str] = Field(default=None, max_length=16)
 
 
 class UserCreateResponseTest(BaseModel):

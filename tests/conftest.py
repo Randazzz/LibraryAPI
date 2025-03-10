@@ -12,7 +12,7 @@ from src.db.base import Base
 from src.db.database import get_db
 from src.db.models.users import Role
 from src.main import app
-from src.schemas.author import AuthorCreateResponseTest
+from src.schemas.author import AuthorResponse
 from src.schemas.users import UserCreateResponseTest
 from tests.utils import create_author_for_tests, create_user
 
@@ -84,7 +84,7 @@ async def create_three_readers() -> None:
 
 
 @pytest.fixture(scope="function")
-async def create_author() -> AuthorCreateResponseTest:
+async def create_author() -> AuthorResponse:
     async with async_session_test() as session:
         return await create_author_for_tests(
             session,

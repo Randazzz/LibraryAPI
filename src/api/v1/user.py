@@ -28,7 +28,7 @@ async def register(
     user_data: UserCreate,
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
-    return await user_service.create_user(user_data)
+    return await user_service.create(user_data)
 
 
 @router.patch(
@@ -43,7 +43,7 @@ async def change_user_role(
     current_user: str = Depends(superuser_required),
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
-    user = await user_service.change_user_role(user_id, new_role)
+    user = await user_service.change_role(user_id, new_role)
     logger.info(
         f"Пользователь {current_user} изменил роль пользователя с id '{user_id}' на {new_role}"
     )
@@ -62,7 +62,9 @@ async def get_users(
     current_user: str = Depends(admin_required),
     user_service: UserService = Depends(get_user_service),
 ) -> list[UserResponse]:
-    return await user_service.get_users(limit=limit, offset=offset)
+    return await user_service.get_all_with_pagination(
+        limit=limit, offset=offset
+    )
 
 
 @router.get(
@@ -89,4 +91,4 @@ async def update_current_user(
     current_user: User = Depends(get_current_user_for_access),
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
-    return await user_service.update_user_data(current_user.id, new_data)
+    return await user_service.update_data(current_user.id, new_data)

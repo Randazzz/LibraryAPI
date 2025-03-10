@@ -24,7 +24,7 @@ class UserRepository:
             await self.db.rollback()
             raise UserAlreadyExistsException()
 
-    async def get_by_email(self, email: EmailStr) -> User | None:
+    async def get_by_email_or_none(self, email: EmailStr) -> User | None:
         stmt = select(User).filter(User.email == email)  # type: ignore
         result = await self.db.execute(stmt)
         user = result.scalars().first()
@@ -32,7 +32,7 @@ class UserRepository:
             return None
         return user
 
-    async def get_by_id(self, user_id: uuid.UUID) -> User | None:
+    async def get_by_id_or_none(self, user_id: uuid.UUID) -> User | None:
         stmt = select(User).filter(User.id == user_id)  # type: ignore
         result = await self.db.execute(stmt)
         user = result.scalars().first()
@@ -40,11 +40,13 @@ class UserRepository:
             return None
         return user
 
-    async def update_user(self, user: User) -> None:
-        await self.db.commit()
-        await self.db.refresh(user)
-
-    async def get_users(self, limit: int, offset: int) -> Sequence[User]:
+    async def get_all_with_pagination(
+        self, limit: int, offset: int
+    ) -> Sequence[User]:
         stmt = select(User).order_by(User.email).offset(offset).limit(limit)
         result = await self.db.execute(stmt)
         return result.scalars().all()
+
+    async def update(self, user: User) -> None:
+        await self.db.commit()
+        await self.db.refresh(user)

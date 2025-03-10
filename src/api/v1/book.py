@@ -23,6 +23,6 @@ async def create_book(
     current_user: User = Depends(admin_required),
     book_service: BookService = Depends(get_book_service),
 ) -> BookResponse:
-    book = await book_service.create_book(book_data)
+    book = await book_service.create(book_data)
     logger.info(f"Пользователь {current_user} добавил книгу '{book}'")
     return book

@@ -4,7 +4,7 @@ import pytest
 from httpx import AsyncClient
 from pydantic import ValidationError
 
-from src.schemas.author import AuthorCreateResponseTest, AuthorResponse
+from src.schemas.author import AuthorResponse
 from src.schemas.users import UserCreateResponseTest
 
 
@@ -68,7 +68,7 @@ async def test_get_authors(async_client: AsyncClient, create_three_authors):
 async def test_update_author(
     async_client: AsyncClient,
     create_admin: UserCreateResponseTest,
-    create_author: AuthorCreateResponseTest,
+    create_author: AuthorResponse,
 ):
     new_author_data = {
         "name": "new name",
@@ -106,7 +106,7 @@ async def test_update_author(
 async def test_delete_author(
     async_client: AsyncClient,
     create_admin: UserCreateResponseTest,
-    create_author: AuthorCreateResponseTest,
+    create_author: AuthorResponse,
 ):
     headers = {"Authorization": f"Bearer {create_admin.access_token}"}
     author_id = create_author.id

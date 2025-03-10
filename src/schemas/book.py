@@ -1,19 +1,22 @@
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from src.schemas.author import AuthorResponse
 from src.schemas.genre import GenreResponse
 
 
-class BookCreate(BaseModel):
-    title: str
-    description: Optional[str]
+class BookBase(BaseModel):
+    title: str = Field(..., max_length=64)
+    description: Optional[str] = Field(default=None, max_length=256)
     published_at: date
+    available_copies: Optional[int] = Field(default=0)
+
+
+class BookCreate(BookBase):
     author_ids: list[int]
     genre_ids: list[int]
-    available_copies: int
 
     @field_validator("author_ids", "genre_ids", mode="before")
     def convert_to_list(cls, value):
@@ -22,13 +25,8 @@ class BookCreate(BaseModel):
         return value
 
 
-class BookResponse(BaseModel):
-    id: int
-    title: str
-    description: Optional[str] = None
-    published_at: date
+class BookResponse(BookBase):
     authors: list[AuthorResponse]
     genres: list[GenreResponse]
-    available_copies: int
 
     model_config = ConfigDict(from_attributes=True)

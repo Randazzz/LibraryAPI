@@ -13,7 +13,7 @@ class BookService:
         self.author_service = AuthorService(db)
         self.genre_service = GenreService(db)
 
-    async def create_book(self, book_data: BookCreate) -> BookResponse:
+    async def create(self, book_data: BookCreate) -> BookResponse:
         authors: list[Author] = await self.author_service.get_by_ids_or_raise(
             book_data.author_ids
         )

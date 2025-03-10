@@ -45,5 +45,5 @@ async def get_current_user(
     user_service: UserService,
 ) -> User:
     payload = await get_payload(credentials, expected_token_type)
-    user = await user_service.get_user_by_id(payload["sub"])
+    user = await user_service.get_by_id_or_raise(payload["sub"])
     return user

@@ -8,7 +8,7 @@ from src.core.security import hash_password
 from src.db.models import User
 from src.db.models.books import Author
 from src.db.models.users import Role
-from src.schemas.author import AuthorCreateResponseTest
+from src.schemas.author import AuthorResponse
 from src.schemas.users import UserCreateResponseTest
 
 
@@ -46,7 +46,7 @@ async def create_author_for_tests(
     name: str = "Some Author",
     birth_date: str = "2000-12-24",
     biography: str = None,
-) -> AuthorCreateResponseTest:
+) -> AuthorResponse:
     birth_date = datetime.strptime(birth_date, "%Y-%m-%d").date()
     author = Author(
         name=name,
@@ -55,7 +55,7 @@ async def create_author_for_tests(
     )
     session.add(author)
     await session.commit()
-    return AuthorCreateResponseTest(
+    return AuthorResponse(
         id=author.id,
         name=name,
         birth_date=birth_date,

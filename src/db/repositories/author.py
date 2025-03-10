@@ -18,16 +18,18 @@ class AuthorRepository:
             await self.db.commit()
             await self.db.refresh(author)
             return author
-        except IntegrityError as e:
+        except IntegrityError:
             await self.db.rollback()
             raise AuthorAlreadyExistsException()
 
-    async def get_authors(self, limit: int, offset: int) -> Sequence[Author]:
+    async def get_all_with_pagination(
+        self, limit: int, offset: int
+    ) -> Sequence[Author]:
         stmt = select(Author).order_by(Author.id).offset(offset).limit(limit)
         result = await self.db.execute(stmt)
         return result.scalars().all()
 
-    async def get_by_id(self, author_id: int) -> Author | None:
+    async def get_by_id_or_none(self, author_id: int) -> Author | None:
         stmt = select(Author).filter(Author.id == author_id)  # type: ignore
         result = await self.db.execute(stmt)
         author = result.scalars().first()
@@ -35,16 +37,16 @@ class AuthorRepository:
             return None
         return author
 
-    async def update_author(self, author: Author) -> None:
-        await self.db.commit()
-        await self.db.refresh(author)
-
-    async def delete_author(self, author: Author) -> None:
-        await self.db.delete(author)
-        await self.db.commit()
-
     async def get_by_ids_or_none(self, author_ids) -> list[Author] | None:
         stmt = select(Author).filter(Author.id.in_(author_ids))
         result = await self.db.execute(stmt)
         authors = result.scalars().all()
         return authors if authors else None
+
+    async def update(self, author: Author) -> None:
+        await self.db.commit()
+        await self.db.refresh(author)
+
+    async def delete(self, author: Author) -> None:
+        await self.db.delete(author)
+        await self.db.commit()
