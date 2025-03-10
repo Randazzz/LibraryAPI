@@ -46,3 +46,9 @@ class AuthorService:
         author = await self.get_author_by_id(author_id)
         await self.author_repo.delete_author(author)
         return author
+
+    async def get_by_ids_or_raise(self, author_ids: list[int]) -> list[Author]:
+        authors = await self.author_repo.get_by_ids_or_none(author_ids)
+        if authors is None:
+            raise AuthorNotFoundException()
+        return authors

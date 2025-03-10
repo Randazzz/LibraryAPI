@@ -8,6 +8,8 @@ from src.db.database import get_db
 from src.db.models import User
 from src.services.auth import AuthService
 from src.services.author import AuthorService
+from src.services.book import BookService
+from src.services.genre import GenreService
 from src.services.user import UserService
 
 bearer_scheme = HTTPBearer()
@@ -23,6 +25,14 @@ def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
 
 def get_author_service(db: AsyncSession = Depends(get_db)) -> AuthorService:
     return AuthorService(db)
+
+
+def get_genre_service(db: AsyncSession = Depends(get_db)) -> GenreService:
+    return GenreService(db)
+
+
+def get_book_service(db: AsyncSession = Depends(get_db)) -> BookService:
+    return BookService(db)
 
 
 async def get_current_user_for_access(

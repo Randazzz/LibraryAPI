@@ -45,3 +45,9 @@ class AuthorRepository:
     async def delete_author(self, author: Author) -> None:
         await self.db.delete(author)
         await self.db.commit()
+
+    async def get_by_ids_or_none(self, author_ids) -> list[Author] | None:
+        stmt = select(Author).filter(Author.id.in_(author_ids))
+        result = await self.db.execute(stmt)
+        authors = result.scalars().all()
+        return authors if authors else None
