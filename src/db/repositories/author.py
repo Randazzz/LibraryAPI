@@ -1,10 +1,10 @@
 from typing import Sequence
 
-from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.exceptions import AuthorAlreadyExistsException
 from src.db.models.books import Author
 
 
@@ -20,10 +20,7 @@ class AuthorRepository:
             return author
         except IntegrityError as e:
             await self.db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Author with this name already exists.",
-            )
+            raise AuthorAlreadyExistsException()
 
     async def get_authors(self, limit: int, offset: int) -> Sequence[Author]:
         stmt = select(Author).order_by(Author.id).offset(offset).limit(limit)

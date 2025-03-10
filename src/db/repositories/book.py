@@ -1,7 +1,7 @@
-from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.exceptions import BookAlreadyExistsException
 from src.db.models.books import Book
 
 
@@ -16,7 +16,4 @@ class BookRepository:
             return book
         except IntegrityError:
             await self.db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Book with this title already exists.",
-            )
+            raise BookAlreadyExistsException()

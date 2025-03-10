@@ -1,4 +1,6 @@
-from fastapi import Depends, HTTPException, status
+from typing import Callable, Type, TypeVar
+
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,24 +17,21 @@ from src.services.user import UserService
 bearer_scheme = HTTPBearer()
 
 
-def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
-    return UserService(db)
+T = TypeVar("T")
 
 
-def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
-    return AuthService(db)
+def get_service(service_class: Type[T]) -> Callable[[AsyncSession], T]:
+    def _get_service(db: AsyncSession = Depends(get_db)) -> T:
+        return service_class(db)
+
+    return _get_service
 
 
-def get_author_service(db: AsyncSession = Depends(get_db)) -> AuthorService:
-    return AuthorService(db)
-
-
-def get_genre_service(db: AsyncSession = Depends(get_db)) -> GenreService:
-    return GenreService(db)
-
-
-def get_book_service(db: AsyncSession = Depends(get_db)) -> BookService:
-    return BookService(db)
+get_user_service = get_service(UserService)
+get_auth_service = get_service(AuthService)
+get_author_service = get_service(AuthorService)
+get_genre_service = get_service(GenreService)
+get_book_service = get_service(BookService)
 
 
 async def get_current_user_for_access(
@@ -40,7 +39,9 @@ async def get_current_user_for_access(
     user_service: UserService = Depends(get_user_service),
 ) -> User:
     return await get_current_user(
-        token_type="access", credentials=credentials, user_service=user_service
+        expected_token_type="access",
+        credentials=credentials,
+        user_service=user_service,
     )
 
 
@@ -49,7 +50,7 @@ async def get_current_user_for_refresh(
     user_service: UserService = Depends(get_user_service),
 ) -> User:
     return await get_current_user(
-        token_type="refresh",
+        expected_token_type="refresh",
         credentials=credentials,
         user_service=user_service,
     )

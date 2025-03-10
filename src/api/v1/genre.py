@@ -5,7 +5,7 @@ from starlette import status
 
 from src.core.dependencies import admin_required, get_genre_service
 from src.db.models import User
-from src.schemas.genre import GenreResponse, GenreCreate
+from src.schemas.genre import GenreCreate, GenreResponse
 from src.services.genre import GenreService
 
 logger = logging.getLogger(__name__)

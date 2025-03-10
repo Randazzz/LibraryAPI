@@ -1,8 +1,8 @@
-from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.exceptions import GenreAlreadyExistsException
 from src.db.models.books import Genre
 
 
@@ -18,10 +18,7 @@ class GenreRepository:
             return genre
         except IntegrityError:
             await self.db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Genre with this name already exists.",
-            )
+            raise GenreAlreadyExistsException()
 
     async def get_by_ids_or_none(self, genre_ids) -> list[Genre] | None:
         stmt = select(Genre).filter(Genre.id.in_(genre_ids))

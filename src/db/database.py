@@ -1,7 +1,6 @@
 import logging
 from typing import AsyncGenerator
 
-from fastapi import HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -10,6 +9,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.core.config import settings
+from src.core.exceptions import DatabaseConnectionException
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,4 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             yield session
         except SQLAlchemyError as e:
             logger.error(f"Ошибка подключения к базе данных: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Database connection error",
-            )
+            raise DatabaseConnectionException()

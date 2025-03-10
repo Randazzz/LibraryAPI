@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, status
 from src.core.dependencies import admin_required, get_book_service
 from src.db.models import User
 from src.schemas.book import BookCreate, BookResponse
-
 from src.services.book import BookService
 
 logger = logging.getLogger(__name__)

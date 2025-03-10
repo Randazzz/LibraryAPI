@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from . import auth, author, user, book, genre
+from . import auth, author, book, genre, user
 
 router = APIRouter(prefix="/api/v1")
 

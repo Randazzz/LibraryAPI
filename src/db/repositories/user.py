@@ -1,12 +1,12 @@
 import uuid
 from typing import Sequence
 
-from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.exceptions import UserAlreadyExistsException
 from src.db.models.users import User
 
 
@@ -22,10 +22,7 @@ class UserRepository:
             return user
         except IntegrityError as e:
             await self.db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User with this email already exists.",
-            )
+            raise UserAlreadyExistsException()
 
     async def get_by_email(self, email: EmailStr) -> User | None:
         stmt = select(User).filter(User.email == email)  # type: ignore

@@ -15,7 +15,7 @@ class BookCreate(BaseModel):
     genre_ids: list[int]
     available_copies: int
 
-    @field_validator('author_ids', 'genre_ids', mode='before')
+    @field_validator("author_ids", "genre_ids", mode="before")
     def convert_to_list(cls, value):
         if isinstance(value, int):
             return [value]

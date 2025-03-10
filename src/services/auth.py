@@ -1,7 +1,7 @@
-from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.auth import create_access_token, create_refresh_token
+from src.core.exceptions import InvalidCredentialException
 from src.core.security import verify_password
 from src.db.repositories.user import UserRepository
 from src.schemas.auth import TokenResponse
@@ -17,10 +17,7 @@ class AuthService:
         if not db_user or not verify_password(
             user_data.password, db_user.hashed_password
         ):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid credentials",
-            )
+            raise InvalidCredentialException()
 
         access_token = create_access_token(data={"sub": db_user.id})
         refresh_token = create_refresh_token(data={"sub": db_user.id})

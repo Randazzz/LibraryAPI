@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.models.books import Book, Genre, Author
+from src.db.models.books import Author, Book, Genre
 from src.db.repositories.book import BookRepository
 from src.schemas.book import BookCreate, BookResponse
 from src.services.author import AuthorService
@@ -14,8 +14,12 @@ class BookService:
         self.genre_service = GenreService(db)
 
     async def create_book(self, book_data: BookCreate) -> BookResponse:
-        authors: list[Author] = await self.author_service.get_by_ids_or_raise(book_data.author_ids)
-        genres: list[Genre] = await self.genre_service.get_by_ids_or_raise(book_data.genre_ids)
+        authors: list[Author] = await self.author_service.get_by_ids_or_raise(
+            book_data.author_ids
+        )
+        genres: list[Genre] = await self.genre_service.get_by_ids_or_raise(
+            book_data.genre_ids
+        )
         book = Book(
             title=book_data.title,
             description=book_data.description,
