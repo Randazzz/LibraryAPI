@@ -48,7 +48,6 @@ class AuthorService:
         await self.author_repo.update(author)
         return AuthorResponse.model_validate(author)
 
-    async def delete(self, author_id):
+    async def delete(self, author_id) -> None:
         author = await self.get_by_id_or_raise(author_id)
         await self.author_repo.delete(author)
-        return author

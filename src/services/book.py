@@ -1,8 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.exceptions.not_found import BookNotFoundException
 from src.db.models.books import Author, Book, Genre
 from src.db.repositories.book import BookRepository
-from src.schemas.book import BookCreate, BookResponse
+from src.schemas.book import BookCreate, BookResponse, BookUpdate
 from src.services.author import AuthorService
 from src.services.genre import GenreService
 
@@ -30,3 +31,30 @@ class BookService:
         )
         created_book = await self.book_repo.create(book)
         return BookResponse.model_validate(created_book)
+
+    async def get_all_with_pagination(
+        self, limit: int, offset: int
+    ) -> list[BookResponse]:
+        books = await self.book_repo.get_all_with_pagination(
+            limit=limit, offset=offset
+        )
+        return [BookResponse.model_validate(book) for book in books]
+
+    async def get_by_id_or_raise(self, book_id: int) -> Book:
+        book = await self.book_repo.get_by_id_or_none(book_id)
+        if book is None:
+            raise BookNotFoundException()
+        return book
+
+    async def update(self, book_id: int, new_data: BookUpdate) -> BookResponse:
+        book = await self.get_by_id_or_raise(book_id)
+        for key, value in new_data.model_dump(
+            exclude_none=True, exclude_unset=True
+        ).items():
+            setattr(book, key, value)
+        await self.book_repo.update(book)
+        return BookResponse.model_validate(book)
+
+    async def delete(self, book_id) -> None:
+        book = await self.get_by_id_or_raise(book_id)
+        await self.book_repo.delete(book)

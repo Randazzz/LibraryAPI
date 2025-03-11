@@ -10,6 +10,7 @@ class ErrorMessage(str, Enum):
     USER_NOT_FOUND = "User not found"
     AUTHOR_NOT_FOUND = "Author not found"
     GENRE_NOT_FOUND = "Genre not found"
+    BOOK_NOT_FOUND = "Book not found"
 
     INVALID_TOKEN = "Invalid token"
     PERMISSION_DENIED = "Permission denied"

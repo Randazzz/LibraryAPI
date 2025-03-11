@@ -19,8 +19,8 @@ class AuthorResponse(AuthorCreate):
 class AuthorUpdate(BaseModel):
     name: Optional[str] = Field(default=None, max_length=32)
     biography: Optional[str] = Field(default=None, max_length=1024)
-    birth_date: Optional[date]
+    birth_date: Optional[date] = Field(default=None)
 
 
 class AuthorDeleteResponse(BaseModel):
-    message: Optional[str] = "Author deleted successfully"
+    message: Optional[str] = Field(default="Author deleted successfully")

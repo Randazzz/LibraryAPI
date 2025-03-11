@@ -26,7 +26,21 @@ class BookCreate(BookBase):
 
 
 class BookResponse(BookBase):
+    id: int
     authors: list[AuthorResponse]
     genres: list[GenreResponse]
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class BookUpdate(BaseModel):
+    title: Optional[str] = Field(default=None, max_length=64)
+    description: Optional[str] = Field(default=None, max_length=256)
+    published_at: Optional[date] = Field(default=None)
+    available_copies: Optional[int] = Field(default=None)
+    author_ids: Optional[list[int]] = Field(default=None)
+    genre_ids: Optional[list[int]] = Field(default=None)
+
+
+class BookDeleteResponse(BaseModel):
+    message: Optional[str] = Field(default="Book deleted successfully")
