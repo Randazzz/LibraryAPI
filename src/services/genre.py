@@ -22,3 +22,21 @@ class GenreService:
         if genres is None:
             raise GenreNotFoundException()
         return genres
+
+    async def get_by_id_or_raise(self, genre_id: int) -> Genre:
+        genre = await self.genre_repo.get_by_id_or_none(genre_id)
+        if genre is None:
+            raise GenreNotFoundException()
+        return genre
+
+    async def get_all_with_pagination(
+        self, limit: int, offset: int
+    ) -> list[GenreResponse]:
+        genres = await self.genre_repo.get_all_with_pagination(
+            limit=limit, offset=offset
+        )
+        return [GenreResponse.model_validate(genre) for genre in genres]
+
+    async def delete(self, genre_id: int) -> None:
+        genre = await self.get_by_id_or_raise(genre_id)
+        await self.genre_repo.delete(genre)

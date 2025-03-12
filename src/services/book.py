@@ -48,6 +48,14 @@ class BookService:
 
     async def update(self, book_id: int, new_data: BookUpdate) -> BookResponse:
         book = await self.get_by_id_or_raise(book_id)
+        if new_data.author_ids:
+            book.authors = await self.author_service.get_by_ids_or_raise(
+                new_data.author_ids
+            )
+        if new_data.genre_ids:
+            book.genres = await self.genre_service.get_by_ids_or_raise(
+                new_data.genre_ids
+            )
         for key, value in new_data.model_dump(
             exclude_none=True, exclude_unset=True
         ).items():

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -9,3 +11,7 @@ class GenreResponse(GenreCreate):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class GenreDeleteResponse(BaseModel):
+    message: Optional[str] = Field(default="Genre deleted successfully")
