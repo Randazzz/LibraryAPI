@@ -9,6 +9,7 @@ from src.schemas.book import (
     BookDeleteResponse,
     BookResponse,
     BookUpdate,
+    BookLoanCreate, BookLoanResponse,
 )
 from src.services.book import BookService
 
@@ -80,3 +81,21 @@ async def delete_book(
     book = await book_service.delete(book_id)
     logger.info(f"Пользователь {current_user} удалил книгу '{book}'")
     return BookDeleteResponse()
+
+
+@router.post(
+    "/lend",
+    response_model=BookLoanResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Lend a book to a reader",
+)
+async def lend_book(
+    book_loan: BookLoanCreate,
+    current_user: User = Depends(admin_required),
+    book_service: BookService = Depends(get_book_service),
+) -> BookLoanResponse:
+    book_loan = await book_service.lend(book_loan)
+    logger.info(
+        f"Пользователь {current_user} выдал книгу с id '{book_loan.book_id}' читателю c id '{book_loan.user_id}'"
+    )
+    return book_loan

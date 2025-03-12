@@ -20,3 +20,8 @@ class BookAlreadyExistsException(AlreadyExistsException):
 class GenreAlreadyExistsException(AlreadyExistsException):
     def __init__(self, detail: str = ErrorMessage.GENRE_ALREADY_EXISTS):
         super().__init__(detail=detail)
+
+
+class BookLoanAlreadyExistsException(AlreadyExistsException):
+    def __init__(self, detail: str = ErrorMessage.BOOK_LOAN_ALREADY_EXISTS):
+        super().__init__(detail=detail)

@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.core.exceptions import BookAlreadyExistsException
-from src.db.models.books import Book
+from src.core.exceptions.already_exists import BookLoanAlreadyExistsException
+from src.db.models.books import Book, BookLoan
 
 
 class BookRepository:
@@ -52,3 +53,22 @@ class BookRepository:
     async def delete(self, book: Book) -> None:
         await self.db.delete(book)
         await self.db.commit()
+
+    async def create_book_loan(self, book_loan: BookLoan) -> BookLoan:
+        try:
+            self.db.add(book_loan)
+            await self.db.commit()
+            return book_loan
+        except IntegrityError:
+            await self.db.rollback()
+            raise BookLoanAlreadyExistsException()
+
+    async def get_book_loans_by_user_id(self, user_id):
+        stmt = (
+            select(BookLoan)
+            .options(selectinload(BookLoan.user), selectinload(BookLoan.book))
+            .filter(BookLoan.user_id == user_id)
+            .order_by(BookLoan.id)
+        )
+        result = await self.db.execute(stmt)
+        return result.scalars().all()

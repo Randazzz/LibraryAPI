@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     DATABASE_NAME: str
 
     BOOK_LOAN_DAYS: int = 14
+    BOOK_LIMIT_FOR_USER: int = 5
 
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"

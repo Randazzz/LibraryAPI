@@ -20,3 +20,8 @@ class GenreNotFoundException(NotFoundException):
 class BookNotFoundException(NotFoundException):
     def __init__(self, detail: str = ErrorMessage.BOOK_NOT_FOUND):
         super().__init__(detail=detail)
+
+
+class BookCopyNotFoundException(NotFoundException):
+    def __init__(self, detail: str = ErrorMessage.BOOK_COPY_NOT_FOUND):
+        super().__init__(detail=detail)

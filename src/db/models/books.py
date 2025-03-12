@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 else:
     User = "User"
 
-from sqlalchemy import Date, ForeignKey
+from sqlalchemy import Date, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.db.base import (
@@ -98,6 +98,10 @@ class BookLoan(Base):
         nullable=False, default=default_return_utc_datetime
     )
     returned: Mapped[bool] = mapped_column(nullable=False, default=False)
+
+    __table_args__ = (
+        UniqueConstraint("book_id", "user_id", name="unique_book_user"),
+    )
 
     def __repr__(self):
         return f"<Loan(id={self.id}, book_id={self.book_id}, user_id={self.user_id}, returned={self.returned})>"

@@ -1,11 +1,16 @@
+import uuid
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.exceptions.not_found import BookNotFoundException
-from src.db.models.books import Author, Book, Genre
+from src.core.config import settings
+from src.core.exceptions.limit_exceeded import BookLimitExceededException
+from src.core.exceptions.not_found import BookNotFoundException, BookCopyNotFoundException
+from src.db.models.books import Author, Book, Genre, BookLoan
 from src.db.repositories.book import BookRepository
-from src.schemas.book import BookCreate, BookResponse, BookUpdate
+from src.schemas.book import BookCreate, BookResponse, BookUpdate, BookLoanCreate, BookLoanResponse
 from src.services.author import AuthorService
 from src.services.genre import GenreService
+from src.services.user import UserService
 
 
 class BookService:
@@ -13,6 +18,7 @@ class BookService:
         self.book_repo = BookRepository(db)
         self.author_service = AuthorService(db)
         self.genre_service = GenreService(db)
+        self.user_service = UserService(db)
 
     async def create(self, book_data: BookCreate) -> BookResponse:
         authors: list[Author] = await self.author_service.get_by_ids_or_raise(
@@ -66,3 +72,24 @@ class BookService:
     async def delete(self, book_id) -> None:
         book = await self.get_by_id_or_raise(book_id)
         await self.book_repo.delete(book)
+
+    async def get_book_loans_by_user_id(self, user_id: uuid.UUID) -> list[BookLoan]:
+        return await self.book_repo.get_book_loans_by_user_id(user_id)
+
+    async def lend(self, book_loan: BookLoanCreate) -> BookLoanResponse:
+        book = await self.get_by_id_or_raise(book_loan.book_id)
+        if book.available_copies <= 0:
+            raise BookCopyNotFoundException()
+        user = await self.user_service.get_by_id_or_raise(book_loan.user_id)
+        users_book_loans = await self.get_book_loans_by_user_id(user.id)
+        if len(users_book_loans) >= settings.BOOK_LIMIT_FOR_USER:
+            raise BookLimitExceededException()
+        book_loan = BookLoan(
+            book_id=book.id,
+            user_id=user.id
+        )
+        created_book_loan = await self.book_repo.create_book_loan(book_loan)
+        book.available_copies -= 1
+        await self.book_repo.update(book)
+        return BookLoanResponse.model_validate(created_book_loan)
+
