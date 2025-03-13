@@ -2,14 +2,14 @@ import logging
 
 from fastapi import APIRouter, Depends, Query, status
 
-from src.core.dependencies import admin_required, get_book_service
+from src.core.dependencies import admin_required, get_book_service, get_current_user_for_access
 from src.db.models import User
 from src.schemas.book import (
     BookCreate,
     BookDeleteResponse,
     BookResponse,
     BookUpdate,
-    BookLoanCreate, BookLoanResponse,
+    BookLoanCreate, BookLoanResponse, BookLoanReturnResponse,
 )
 from src.services.book import BookService
 
@@ -99,3 +99,21 @@ async def lend_book(
         f"Пользователь {current_user} выдал книгу с id '{book_loan.book_id}' читателю c id '{book_loan.user_id}'"
     )
     return book_loan
+
+
+@router.post(
+    "/return-book/{loan_id}",
+    response_model=BookLoanReturnResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Return the book",
+)
+async def return_book(
+    loan_id: int,
+    current_user: User = Depends(get_current_user_for_access),
+    book_service: BookService = Depends(get_book_service),
+) -> BookLoanReturnResponse:
+    book_loan = await book_service.return_book(loan_id, current_user.id)
+    logger.info(
+        f"Пользователь {current_user} вернул книгу с id '{book_loan.book_id}'"
+    )
+    return BookLoanReturnResponse()

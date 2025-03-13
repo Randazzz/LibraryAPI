@@ -13,6 +13,7 @@ class ErrorMessage(str, Enum):
     GENRE_NOT_FOUND = "Genre not found"
     BOOK_NOT_FOUND = "Book not found"
     BOOK_COPY_NOT_FOUND = "No copies available"
+    BOOK_LOAN_NOT_FOUND = "Book loan not found"
 
     INVALID_TOKEN = "Invalid token"
     PERMISSION_DENIED = "Permission denied"

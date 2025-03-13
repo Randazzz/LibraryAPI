@@ -1,13 +1,14 @@
 import uuid
+from datetime import datetime, UTC
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
 from src.core.exceptions.limit_exceeded import BookLimitExceededException
-from src.core.exceptions.not_found import BookNotFoundException, BookCopyNotFoundException
+from src.core.exceptions.not_found import BookNotFoundException, BookCopyNotFoundException, BookLoanNotFoundException
 from src.db.models.books import Author, Book, Genre, BookLoan
 from src.db.repositories.book import BookRepository
-from src.schemas.book import BookCreate, BookResponse, BookUpdate, BookLoanCreate, BookLoanResponse
+from src.schemas.book import BookCreate, BookResponse, BookUpdate, BookLoanCreate, BookLoanResponse, BookLoanUpdate
 from src.services.author import AuthorService
 from src.services.genre import GenreService
 from src.services.user import UserService
@@ -67,14 +68,30 @@ class BookService:
         ).items():
             setattr(book, key, value)
         await self.book_repo.update(book)
-        return BookResponse.model_validate(book)
+        updated_book = await self.get_by_id_or_raise(book.id)
+        return BookResponse.model_validate(updated_book)
 
     async def delete(self, book_id) -> None:
         book = await self.get_by_id_or_raise(book_id)
         await self.book_repo.delete(book)
 
+    async def get_book_loan_by_id_or_raise(self, book_loan_id: int) -> BookLoan:
+        book_loan = await self.book_repo.get_book_loan_by_id_or_none(book_loan_id)
+        if book_loan is None:
+            raise BookLoanNotFoundException()
+        return book_loan
+
     async def get_book_loans_by_user_id(self, user_id: uuid.UUID) -> list[BookLoan]:
         return await self.book_repo.get_book_loans_by_user_id(user_id)
+
+    async def update_book_loan(self, book_loan_id: int, new_data: BookLoanUpdate) -> BookLoanResponse:
+        book_loan = await self.get_book_loan_by_id_or_raise(book_loan_id)
+        for key, value in new_data.model_dump(
+            exclude_none=True, exclude_unset=True
+        ).items():
+            setattr(book_loan, key, value)
+        await self.book_repo.update_book_loan(book_loan)
+        return BookLoanResponse.model_validate(book_loan)
 
     async def lend(self, book_loan: BookLoanCreate) -> BookLoanResponse:
         book = await self.get_by_id_or_raise(book_loan.book_id)
@@ -93,3 +110,16 @@ class BookService:
         await self.book_repo.update(book)
         return BookLoanResponse.model_validate(created_book_loan)
 
+    async def return_book(self, loan_id: int, user_id: uuid.UUID) -> BookLoanResponse:
+        book_loan = await self.get_book_loan_by_id_or_raise(loan_id)
+        if user_id != book_loan.user_id or book_loan.returned:
+            raise BookLoanNotFoundException()
+        book_loan_new_data = BookLoanUpdate(
+            returned=True,
+            return_date=datetime.now(UTC).replace(tzinfo=None),
+        )
+        updated_book_loan = await self.update_book_loan(loan_id, book_loan_new_data)
+        book = book_loan.book
+        book_new_data = BookUpdate(available_copies=book.available_copies + 1)
+        await self.update(book.id, book_new_data)
+        return BookLoanResponse.model_validate(updated_book_loan)

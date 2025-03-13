@@ -1,3 +1,4 @@
+import uuid
 from typing import Sequence
 
 from sqlalchemy import select
@@ -63,12 +64,26 @@ class BookRepository:
             await self.db.rollback()
             raise BookLoanAlreadyExistsException()
 
-    async def get_book_loans_by_user_id(self, user_id):
+    async def get_book_loans_by_user_id(self, user_id: uuid.UUID):
         stmt = (
             select(BookLoan)
             .options(selectinload(BookLoan.user), selectinload(BookLoan.book))
-            .filter(BookLoan.user_id == user_id)
+            .filter(BookLoan.user_id == user_id)  # type: ignore
             .order_by(BookLoan.id)
         )
         result = await self.db.execute(stmt)
         return result.scalars().all()
+
+    async def get_book_loan_by_id_or_none(self, book_loan_id: int) -> BookLoan | None:
+        stmt = (
+            select(BookLoan)
+            .options(selectinload(BookLoan.user), selectinload(BookLoan.book))
+            .filter(BookLoan.id == book_loan_id)  # type: ignore
+        )
+        result = await self.db.execute(stmt)
+        book_loan = result.scalars().first()
+        return book_loan if book_loan else None
+
+    async def update_book_loan(self, book_loan: BookLoan) -> None:
+        await self.db.commit()
+        await self.db.refresh(book_loan)

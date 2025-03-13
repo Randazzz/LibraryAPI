@@ -25,3 +25,8 @@ class BookNotFoundException(NotFoundException):
 class BookCopyNotFoundException(NotFoundException):
     def __init__(self, detail: str = ErrorMessage.BOOK_COPY_NOT_FOUND):
         super().__init__(detail=detail)
+
+
+class BookLoanNotFoundException(NotFoundException):
+    def __init__(self, detail: str = ErrorMessage.BOOK_LOAN_NOT_FOUND):
+        super().__init__(detail=detail)

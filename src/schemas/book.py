@@ -60,19 +60,11 @@ class BookLoanResponse(BookLoanCreate):
 
     model_config = ConfigDict(from_attributes=True)
 
-    # id: Mapped[intpk]
-    # book_id: Mapped[int] = mapped_column(
-    #     ForeignKey("books.id"), nullable=False
-    # )
-    # book: Mapped["Book"] = relationship("Book", back_populates="book_loans")
-    # user_id: Mapped[uuid.UUID] = mapped_column(
-    #     ForeignKey("users.id"), nullable=False
-    # )
-    # user: Mapped["User"] = relationship("User", back_populates="book_loans")
-    # loan_date: Mapped[datetime] = mapped_column(
-    #     nullable=False, default=get_current_utc_datetime
-    # )
-    # return_date: Mapped[datetime] = mapped_column(
-    #     nullable=False, default=default_return_utc_datetime
-    # )
-    # returned: Mapped[bool] = mapped_column(nullable=False, default=False)
+
+class BookLoanUpdate(BaseModel):
+    return_date: datetime
+    returned: bool
+
+
+class BookLoanReturnResponse(BaseModel):
+    message: Optional[str] = Field(default="Book returned successfully")
