@@ -41,6 +41,12 @@ class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class UserResponseWithStats(UserResponse):
+    loan_count: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str

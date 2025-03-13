@@ -6,7 +6,7 @@ from src.core.exceptions import UserNotFoundException
 from src.core.security import hash_password
 from src.db.models.users import Role, User
 from src.db.repositories.user import UserRepository
-from src.schemas.users import UserCreate, UserResponse, UserUpdate
+from src.schemas.users import UserCreate, UserResponse, UserUpdate, UserResponseWithStats
 
 
 class UserService:
@@ -40,6 +40,18 @@ class UserService:
             limit=limit, offset=offset
         )
         return [UserResponse.model_validate(user) for user in users]
+
+    async def get_most_active_users(
+        self, limit: int, offset: int
+    ) -> list[UserResponseWithStats]:
+        users = await self.user_repo.get_most_active_users(
+            limit=limit, offset=offset
+        )
+        users_with_stats = []
+        for user, loan_count in users:
+            user.loan_count = loan_count
+            users_with_stats.append(UserResponseWithStats.model_validate(user))
+        return users_with_stats
 
     async def change_role(
         self, user_id: uuid.UUID, new_role: Role

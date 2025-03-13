@@ -11,7 +11,7 @@ from src.core.dependencies import (
 )
 from src.db.models.users import Role, User
 from src.schemas.common import PaginationParams
-from src.schemas.users import UserCreate, UserResponse, UserUpdate
+from src.schemas.users import UserCreate, UserResponse, UserUpdate, UserResponseWithStats
 from src.services.user import UserService
 
 logger = logging.getLogger(__name__)
@@ -92,3 +92,19 @@ async def update_current_user(
     user_service: UserService = Depends(get_user_service),
 ) -> UserResponse:
     return await user_service.update_data(current_user.id, new_data)
+
+
+@router.get(
+    "/statistics/active-users",
+    response_model=list[UserResponseWithStats],
+    status_code=status.HTTP_200_OK,
+    summary="List of users sorted by activity",
+)
+async def get_active_users(
+    params: PaginationParams = Query(),
+    current_user: str = Depends(admin_required),
+    user_service: UserService = Depends(get_user_service),
+) -> list[UserResponseWithStats]:
+    return await user_service.get_most_active_users(
+        limit=params.limit, offset=params.offset
+    )

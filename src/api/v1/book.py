@@ -129,7 +129,7 @@ async def return_book(
     "/statistics/popular-books",
     response_model=list[BookResponseWithStats],
     status_code=status.HTTP_200_OK,
-    summary="Book list with filtering and pagination",
+    summary="List of books sorted by popularity",
 )
 async def get_popular_books(
     params: PaginationParams = Query(),
