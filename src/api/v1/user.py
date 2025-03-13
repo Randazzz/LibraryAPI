@@ -11,7 +11,12 @@ from src.core.dependencies import (
 )
 from src.db.models.users import Role, User
 from src.schemas.common import PaginationParams
-from src.schemas.users import UserCreate, UserResponse, UserUpdate, UserResponseWithStats
+from src.schemas.users import (
+    UserCreate,
+    UserResponse,
+    UserResponseWithStats,
+    UserUpdate,
+)
 from src.services.user import UserService
 
 logger = logging.getLogger(__name__)

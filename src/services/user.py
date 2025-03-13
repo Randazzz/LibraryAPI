@@ -6,7 +6,12 @@ from src.core.exceptions import UserNotFoundException
 from src.core.security import hash_password
 from src.db.models.users import Role, User
 from src.db.repositories.user import UserRepository
-from src.schemas.users import UserCreate, UserResponse, UserUpdate, UserResponseWithStats
+from src.schemas.users import (
+    UserCreate,
+    UserResponse,
+    UserResponseWithStats,
+    UserUpdate,
+)
 
 
 class UserService:

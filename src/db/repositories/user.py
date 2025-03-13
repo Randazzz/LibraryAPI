@@ -2,7 +2,7 @@ import uuid
 from typing import Sequence
 
 from pydantic import EmailStr
-from sqlalchemy import select, Row, func
+from sqlalchemy import Row, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
