@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from src.schemas.author import AuthorResponse
+from src.schemas.common import PaginationParams
 from src.schemas.genre import GenreResponse
 
 
@@ -41,6 +42,16 @@ class BookUpdate(BaseModel):
     available_copies: Optional[int] = Field(default=None)
     author_ids: Optional[list[int]] = Field(default=None)
     genre_ids: Optional[list[int]] = Field(default=None)
+
+
+class BookFilterParams(BaseModel):
+    title: Optional[str] = Field(default=None)
+    author_ids: Optional[list[int]] = Field(default=None)
+    genre_ids: Optional[list[int]] = Field(default=None)
+
+
+class BookQueryParams(BookFilterParams, PaginationParams):
+    pass
 
 
 class BookDeleteResponse(BaseModel):

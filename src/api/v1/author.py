@@ -10,6 +10,7 @@ from src.schemas.author import (
     AuthorResponse,
     AuthorUpdate,
 )
+from src.schemas.common import PaginationParams
 from src.services.author import AuthorService
 
 logger = logging.getLogger(__name__)
@@ -40,12 +41,11 @@ async def create_author(
     summary="Author list",
 )
 async def get_authors(
-    limit: int = Query(10, ge=1, le=100),
-    offset: int = Query(0, ge=0),
+    pagination_params: PaginationParams = Query(),
     author_service: AuthorService = Depends(get_author_service),
 ) -> list[AuthorResponse]:
     return await author_service.get_all_with_pagination(
-        limit=limit, offset=offset
+        limit=pagination_params.limit, offset=pagination_params.offset
     )
 
 

@@ -2,14 +2,21 @@ import logging
 
 from fastapi import APIRouter, Depends, Query, status
 
-from src.core.dependencies import admin_required, get_book_service, get_current_user_for_access
+from src.core.dependencies import (
+    admin_required,
+    get_book_service,
+    get_current_user_for_access,
+)
 from src.db.models import User
 from src.schemas.book import (
     BookCreate,
     BookDeleteResponse,
+    BookLoanCreate,
+    BookLoanResponse,
+    BookLoanReturnResponse,
+    BookQueryParams,
     BookResponse,
     BookUpdate,
-    BookLoanCreate, BookLoanResponse, BookLoanReturnResponse,
 )
 from src.services.book import BookService
 
@@ -38,16 +45,13 @@ async def create_book(
     "",
     response_model=list[BookResponse],
     status_code=status.HTTP_200_OK,
-    summary="Book list",
+    summary="Book list with filtering and pagination",
 )
 async def get_books(
-    limit: int = Query(10, ge=1, le=100),
-    offset: int = Query(0, ge=0),
+    params: BookQueryParams = Query(),
     book_service: BookService = Depends(get_book_service),
 ) -> list[BookResponse]:
-    return await book_service.get_all_with_pagination(
-        limit=limit, offset=offset
-    )
+    return await book_service.get_all_with_pagination_and_filtration(params)
 
 
 @router.patch(

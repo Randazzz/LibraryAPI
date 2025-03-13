@@ -10,6 +10,7 @@ from src.core.dependencies import (
     superuser_required,
 )
 from src.db.models.users import Role, User
+from src.schemas.common import PaginationParams
 from src.schemas.users import UserCreate, UserResponse, UserUpdate
 from src.services.user import UserService
 
@@ -57,13 +58,12 @@ async def change_user_role(
     summary="User list",
 )
 async def get_users(
-    limit: int = Query(10, ge=1, le=100),
-    offset: int = Query(0, ge=0),
+    pagination_params: PaginationParams = Query(),
     current_user: str = Depends(admin_required),
     user_service: UserService = Depends(get_user_service),
 ) -> list[UserResponse]:
     return await user_service.get_all_with_pagination(
-        limit=limit, offset=offset
+        limit=pagination_params.limit, offset=pagination_params.offset
     )
 
 

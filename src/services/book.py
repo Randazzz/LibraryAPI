@@ -1,14 +1,27 @@
 import uuid
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
 from src.core.exceptions.limit_exceeded import BookLimitExceededException
-from src.core.exceptions.not_found import BookNotFoundException, BookCopyNotFoundException, BookLoanNotFoundException
-from src.db.models.books import Author, Book, Genre, BookLoan
+from src.core.exceptions.not_found import (
+    BookCopyNotFoundException,
+    BookLoanNotFoundException,
+    BookNotFoundException,
+)
+from src.db.models.books import Author, Book, BookLoan, Genre
 from src.db.repositories.book import BookRepository
-from src.schemas.book import BookCreate, BookResponse, BookUpdate, BookLoanCreate, BookLoanResponse, BookLoanUpdate
+from src.schemas.book import (
+    BookCreate,
+    BookFilterParams,
+    BookLoanCreate,
+    BookLoanResponse,
+    BookLoanUpdate,
+    BookQueryParams,
+    BookResponse,
+    BookUpdate,
+)
 from src.services.author import AuthorService
 from src.services.genre import GenreService
 from src.services.user import UserService
@@ -39,11 +52,14 @@ class BookService:
         created_book = await self.book_repo.create(book)
         return BookResponse.model_validate(created_book)
 
-    async def get_all_with_pagination(
-        self, limit: int, offset: int
+    async def get_all_with_pagination_and_filtration(
+        self, params: BookQueryParams
     ) -> list[BookResponse]:
-        books = await self.book_repo.get_all_with_pagination(
-            limit=limit, offset=offset
+        filters = BookFilterParams.model_validate(params).model_dump(
+            exclude_none=True, exclude_unset=True
+        )
+        books = await self.book_repo.get_all_with_pagination_and_filtration(
+            limit=params.limit, offset=params.offset, filters=filters
         )
         return [BookResponse.model_validate(book) for book in books]
 
@@ -75,16 +91,24 @@ class BookService:
         book = await self.get_by_id_or_raise(book_id)
         await self.book_repo.delete(book)
 
-    async def get_book_loan_by_id_or_raise(self, book_loan_id: int) -> BookLoan:
-        book_loan = await self.book_repo.get_book_loan_by_id_or_none(book_loan_id)
+    async def get_book_loan_by_id_or_raise(
+        self, book_loan_id: int
+    ) -> BookLoan:
+        book_loan = await self.book_repo.get_book_loan_by_id_or_none(
+            book_loan_id
+        )
         if book_loan is None:
             raise BookLoanNotFoundException()
         return book_loan
 
-    async def get_book_loans_by_user_id(self, user_id: uuid.UUID) -> list[BookLoan]:
+    async def get_book_loans_by_user_id(
+        self, user_id: uuid.UUID
+    ) -> list[BookLoan]:
         return await self.book_repo.get_book_loans_by_user_id(user_id)
 
-    async def update_book_loan(self, book_loan_id: int, new_data: BookLoanUpdate) -> BookLoanResponse:
+    async def update_book_loan(
+        self, book_loan_id: int, new_data: BookLoanUpdate
+    ) -> BookLoanResponse:
         book_loan = await self.get_book_loan_by_id_or_raise(book_loan_id)
         for key, value in new_data.model_dump(
             exclude_none=True, exclude_unset=True
@@ -101,16 +125,15 @@ class BookService:
         users_book_loans = await self.get_book_loans_by_user_id(user.id)
         if len(users_book_loans) >= settings.BOOK_LIMIT_FOR_USER:
             raise BookLimitExceededException()
-        book_loan = BookLoan(
-            book_id=book.id,
-            user_id=user.id
-        )
+        book_loan = BookLoan(book_id=book.id, user_id=user.id)
         created_book_loan = await self.book_repo.create_book_loan(book_loan)
         book.available_copies -= 1
         await self.book_repo.update(book)
         return BookLoanResponse.model_validate(created_book_loan)
 
-    async def return_book(self, loan_id: int, user_id: uuid.UUID) -> BookLoanResponse:
+    async def return_book(
+        self, loan_id: int, user_id: uuid.UUID
+    ) -> BookLoanResponse:
         book_loan = await self.get_book_loan_by_id_or_raise(loan_id)
         if user_id != book_loan.user_id or book_loan.returned:
             raise BookLoanNotFoundException()
@@ -118,7 +141,9 @@ class BookService:
             returned=True,
             return_date=datetime.now(UTC).replace(tzinfo=None),
         )
-        updated_book_loan = await self.update_book_loan(loan_id, book_loan_new_data)
+        updated_book_loan = await self.update_book_loan(
+            loan_id, book_loan_new_data
+        )
         book = book_loan.book
         book_new_data = BookUpdate(available_copies=book.available_copies + 1)
         await self.update(book.id, book_new_data)

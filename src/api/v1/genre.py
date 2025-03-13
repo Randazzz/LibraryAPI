@@ -5,6 +5,7 @@ from starlette import status
 
 from src.core.dependencies import admin_required, get_genre_service
 from src.db.models import User
+from src.schemas.common import PaginationParams
 from src.schemas.genre import GenreCreate, GenreDeleteResponse, GenreResponse
 from src.services.genre import GenreService
 
@@ -36,12 +37,11 @@ async def create_genre(
     summary="Genre list",
 )
 async def get_genres(
-    limit: int = Query(10, ge=1, le=100),
-    offset: int = Query(0, ge=0),
+    pagination_params: PaginationParams = Query(),
     genre_service: GenreService = Depends(get_genre_service),
 ) -> list[GenreResponse]:
     return await genre_service.get_all_with_pagination(
-        limit=limit, offset=offset
+        limit=pagination_params.limit, offset=pagination_params.offset
     )
 
 
