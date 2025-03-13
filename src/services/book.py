@@ -20,6 +20,7 @@ from src.schemas.book import (
     BookLoanUpdate,
     BookQueryParams,
     BookResponse,
+    BookResponseWithStats,
     BookUpdate,
 )
 from src.services.author import AuthorService
@@ -68,6 +69,18 @@ class BookService:
         if book is None:
             raise BookNotFoundException()
         return book
+
+    async def get_most_popular_books(
+        self, limit: int, offset: int
+    ) -> list[BookResponseWithStats]:
+        books = await self.book_repo.get_most_popular_books(
+            limit=limit, offset=offset
+        )
+        books_with_stats = []
+        for book, loan_count in books:
+            book.loan_count = loan_count
+            books_with_stats.append(BookResponseWithStats.model_validate(book))
+        return books_with_stats
 
     async def update(self, book_id: int, new_data: BookUpdate) -> BookResponse:
         book = await self.get_by_id_or_raise(book_id)

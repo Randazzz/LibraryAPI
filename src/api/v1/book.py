@@ -16,8 +16,10 @@ from src.schemas.book import (
     BookLoanReturnResponse,
     BookQueryParams,
     BookResponse,
+    BookResponseWithStats,
     BookUpdate,
 )
+from src.schemas.common import PaginationParams
 from src.services.book import BookService
 
 logger = logging.getLogger(__name__)
@@ -121,3 +123,18 @@ async def return_book(
         f"Пользователь {current_user} вернул книгу с id '{book_loan.book_id}'"
     )
     return BookLoanReturnResponse()
+
+
+@router.get(
+    "/statistics/popular-books",
+    response_model=list[BookResponseWithStats],
+    status_code=status.HTTP_200_OK,
+    summary="Book list with filtering and pagination",
+)
+async def get_popular_books(
+    params: PaginationParams = Query(),
+    book_service: BookService = Depends(get_book_service),
+) -> list[BookResponseWithStats]:
+    return await book_service.get_most_popular_books(
+        limit=params.limit, offset=params.offset
+    )

@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Optional, Sequence
 
-from sqlalchemy import and_, select
+from sqlalchemy import Row, and_, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -66,6 +66,29 @@ class BookRepository:
         result = await self.db.execute(stmt)
         book = result.scalars().first()
         return book if book else None
+
+    async def get_most_popular_books(
+        self, limit: int, offset: int
+    ) -> Sequence[Row[tuple[Book, int]]]:
+        subquery = (
+            select(
+                BookLoan.book_id, func.count(BookLoan.id).label("loan_count")
+            )
+            .group_by(BookLoan.book_id)
+            .subquery()
+        )
+
+        stmt = (
+            select(Book, func.coalesce(subquery.c.loan_count, 0))
+            .outerjoin(subquery, Book.id == subquery.c.book_id)
+            .options(selectinload(Book.authors), selectinload(Book.genres))
+            .order_by(subquery.c.loan_count.desc().nullslast(), Book.id)
+            .offset(offset)
+            .limit(limit)
+        )
+
+        result = await self.db.execute(stmt)
+        return result.all()
 
     async def update(self, book: Book) -> None:
         await self.db.commit()

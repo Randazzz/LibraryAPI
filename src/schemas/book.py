@@ -35,6 +35,12 @@ class BookResponse(BookBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class BookResponseWithStats(BookResponse):
+    loan_count: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class BookUpdate(BaseModel):
     title: Optional[str] = Field(default=None, max_length=64)
     description: Optional[str] = Field(default=None, max_length=256)
