@@ -20,6 +20,8 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
 
+    REDIS_URL: str = "redis://localhost:6379"
+
     @property
     def database_url(self) -> str:
         return (

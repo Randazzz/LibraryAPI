@@ -2,6 +2,7 @@ import logging
 import uuid
 
 from fastapi import APIRouter, Depends, Query, status
+from fastapi_cache.decorator import cache
 
 from src.core.dependencies import (
     admin_required,
@@ -62,6 +63,7 @@ async def change_user_role(
     status_code=status.HTTP_200_OK,
     summary="User list",
 )
+@cache(expire=60)
 async def get_users(
     pagination_params: PaginationParams = Query(),
     current_user: str = Depends(admin_required),
@@ -105,6 +107,7 @@ async def update_current_user(
     status_code=status.HTTP_200_OK,
     summary="List of users sorted by activity",
 )
+@cache(expire=60)
 async def get_active_users(
     params: PaginationParams = Query(),
     current_user: str = Depends(admin_required),

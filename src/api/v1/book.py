@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, Query, status
+from fastapi_cache.decorator import cache
 
 from src.core.dependencies import (
     admin_required,
@@ -49,6 +50,7 @@ async def create_book(
     status_code=status.HTTP_200_OK,
     summary="Book list with filtering and pagination",
 )
+@cache(expire=60)
 async def get_books(
     params: BookQueryParams = Query(),
     book_service: BookService = Depends(get_book_service),
@@ -131,6 +133,7 @@ async def return_book(
     status_code=status.HTTP_200_OK,
     summary="List of books sorted by popularity",
 )
+@cache(expire=60)
 async def get_popular_books(
     params: PaginationParams = Query(),
     book_service: BookService = Depends(get_book_service),

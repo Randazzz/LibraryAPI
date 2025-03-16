@@ -1,7 +1,7 @@
 import logging
 
-from fastapi import APIRouter, Depends, Query
-from starlette import status
+from fastapi import APIRouter, Depends, Query, status
+from fastapi_cache.decorator import cache
 
 from src.core.dependencies import admin_required, get_genre_service
 from src.db.models import User
@@ -36,6 +36,7 @@ async def create_genre(
     status_code=status.HTTP_200_OK,
     summary="Genre list",
 )
+@cache(expire=60)
 async def get_genres(
     pagination_params: PaginationParams = Query(),
     genre_service: GenreService = Depends(get_genre_service),

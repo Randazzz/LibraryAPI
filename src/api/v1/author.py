@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, Query, status
+from fastapi_cache.decorator import cache
 
 from src.core.dependencies import admin_required, get_author_service
 from src.db.models import User
@@ -40,6 +41,7 @@ async def create_author(
     status_code=status.HTTP_200_OK,
     summary="Author list",
 )
+@cache(expire=60)
 async def get_authors(
     pagination_params: PaginationParams = Query(),
     author_service: AuthorService = Depends(get_author_service),
