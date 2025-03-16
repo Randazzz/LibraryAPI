@@ -41,7 +41,9 @@ async def test_create_author(
     assert author_response.biography == author_data["biography"]
 
 
-async def test_get_authors(async_client: AsyncClient, create_three_authors):
+async def test_get_authors(
+    async_client: AsyncClient, create_three_authors: None
+):
     response = await async_client.get("/api/v1/authors")
     response_json = response.json()
     assert (

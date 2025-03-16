@@ -1,6 +1,8 @@
+from datetime import datetime
 from typing import AsyncGenerator
 
 import pytest
+from faker import Faker
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
@@ -10,11 +12,21 @@ from sqlalchemy.ext.asyncio import (
 from src.core.config import test_settings
 from src.db.base import Base
 from src.db.database import get_db
+from src.db.models.books import Author, Genre
 from src.db.models.users import Role
 from src.main import app
 from src.schemas.author import AuthorResponse
+from src.schemas.book import BookResponse
+from src.schemas.genre import GenreResponse
 from src.schemas.users import UserCreateResponseTest
-from tests.utils import create_author_for_tests, create_user
+from tests.utils import (
+    create_author_for_tests,
+    create_book_for_tests,
+    create_genre_for_tests,
+    create_user_for_tests,
+)
+
+fake = Faker()
 
 DATABASE_URL_TEST: str = test_settings.database_url
 
@@ -55,7 +67,7 @@ async def async_client() -> AsyncClient:
 @pytest.fixture(scope="function")
 async def create_superuser() -> UserCreateResponseTest:
     async with async_session_test() as session:
-        return await create_user(
+        return await create_user_for_tests(
             session, "superuser@example.com", "Superuser1!", is_superuser=True
         )
 
@@ -63,7 +75,7 @@ async def create_superuser() -> UserCreateResponseTest:
 @pytest.fixture(scope="function")
 async def create_admin() -> UserCreateResponseTest:
     async with async_session_test() as session:
-        return await create_user(
+        return await create_user_for_tests(
             session, "administrator@example.com", "Administrator1!", Role.ADMIN
         )
 
@@ -71,14 +83,14 @@ async def create_admin() -> UserCreateResponseTest:
 @pytest.fixture(scope="function")
 async def create_reader() -> UserCreateResponseTest:
     async with async_session_test() as session:
-        return await create_user(session, "reader0@example.com", "Reader0!")
+        return await create_user_for_tests(session, fake.email(), "Reader0!")
 
 
 @pytest.fixture(scope="function")
 async def create_three_readers() -> None:
     async with async_session_test() as session:
         for i in range(3):
-            await create_user(
+            await create_user_for_tests(
                 session, f"reader{i + 1}@example.com", f"Reader{i + 1}!"
             )
 
@@ -103,4 +115,55 @@ async def create_three_authors() -> None:
                 f"Some Author{i + 1}",
                 f"200{i + 1}-12-24",
                 biography=f"author{i + 1} biography",
+            )
+
+
+@pytest.fixture(scope="function")
+async def create_genre() -> GenreResponse:
+    async with async_session_test() as session:
+        return await create_genre_for_tests(session, "SomeGenre")
+
+
+@pytest.fixture(scope="function")
+async def create_book() -> BookResponse:
+    async with async_session_test() as session:
+        author = Author(
+            id=1,
+            name="SomeAuthor",
+            biography="",
+            birth_date=datetime.strptime("1890-12-24", "%Y-%m-%d").date(),
+        )
+        genre = Genre(
+            name="SomeGenre",
+        )
+        return await create_book_for_tests(
+            session,
+            title="SomeGenre",
+            published_at=f"2000-12-24",
+            available_copies=1,
+            authors=[author],
+            genres=[genre],
+        )
+
+
+@pytest.fixture(scope="function")
+async def create_three_books() -> None:
+    async with async_session_test() as session:
+        author = Author(
+            id=1,
+            name="SomeAuthor",
+            biography="",
+            birth_date=datetime.strptime("1890-12-24", "%Y-%m-%d").date(),
+        )
+        genre = Genre(
+            name="SomeGenre",
+        )
+        for i in range(3):
+            await create_book_for_tests(
+                session,
+                title=f"book{i + 1}@example.com",
+                published_at=f"200{i + 1}-12-24",
+                available_copies=i + 1,
+                authors=[author],
+                genres=[genre],
             )
