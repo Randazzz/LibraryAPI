@@ -3,7 +3,10 @@ from typing import AsyncGenerator
 
 import pytest
 from faker import Faker
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from httpx import ASGITransport, AsyncClient
+from redis import asyncio as aioredis
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
@@ -54,6 +57,17 @@ async def setup_test_db() -> AsyncGenerator[None, None]:
         async with engine_test.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
         await engine_test.dispose()
+
+
+@pytest.fixture(scope="function", autouse=True)
+async def initialize_cache() -> AsyncGenerator[None, None]:
+    redis = aioredis.from_url(
+        test_settings.REDIS_URL, encoding="utf8", decode_responses=True
+    )
+    await redis.ping()
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    yield
+    await redis.aclose()
 
 
 @pytest.fixture

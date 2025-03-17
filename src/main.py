@@ -33,7 +33,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         raise RuntimeError(f"Redis connection error: {e}")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
-    await redis.close()
+    await redis.aclose()
 
 
 app = FastAPI(debug=settings.DEBUG, lifespan=lifespan)
