@@ -1,7 +1,10 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    ENV: str
     DEBUG: bool
 
     DATABASE_HOST: str
@@ -30,13 +33,15 @@ class Settings(BaseSettings):
             f"{self.DATABASE_PORT}/{self.DATABASE_NAME}"
         )
 
-    model_config = SettingsConfigDict(env_file=".env.dev", env_prefix="DEV_")
+    model_config = SettingsConfigDict(
+        env_file=f".env.{os.getenv('ENV', 'dev')}", env_file_encoding="utf-8"
+    )
 
 
 class TestSettings(Settings):
     LOG_LEVEL: str = "WARNING"
 
-    model_config = SettingsConfigDict(env_file=".env.test", env_prefix="TEST_")
+    model_config = SettingsConfigDict(env_file=".env.test")
 
 
 test_settings = TestSettings()

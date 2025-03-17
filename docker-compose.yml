@@ -3,8 +3,11 @@ services:
     build: .
     ports:
       - "8000:8000"
+    environment:
+      ENV: ${ENV}
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:latest
@@ -16,6 +19,11 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
 
 volumes:
   pgdata:

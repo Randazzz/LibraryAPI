@@ -2,6 +2,7 @@
 venv/
 .env.dev
 .env.test
+.env.prod
 
 # Игнорировать файлы IDE
 .idea/
